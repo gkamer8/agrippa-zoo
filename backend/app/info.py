@@ -1,6 +1,6 @@
 from flask import Blueprint
-
 from app.db import get_db
+import json
 
 bp = Blueprint('info', __name__, url_prefix='/info')
 
@@ -11,7 +11,9 @@ def register():
 
     manifest = db.execute(
         "SELECT * FROM models"
-    )
-    print(manifest)
-    
-    return str(manifest)
+    ).fetchall()
+
+    results = [tuple(row) for row in manifest]
+    data = json.dumps(results)
+
+    return data
