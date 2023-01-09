@@ -38,7 +38,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={
                         <div>
-                            {topText}
+                            <div className='desc'>{topText}</div>
                             <ModelSquares items={items} />
                         </div>
                     } />
