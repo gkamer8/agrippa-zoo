@@ -1,28 +1,65 @@
 import './ModelSquare.css';
-import { useNavigate } from "react-router-dom";
+import { Component } from 'react';
+import { Link } from 'react-router-dom'
+import { BACKEND_URL } from './Api.js'
 
-
-function ModelSquares(props) {
-
-    const navigate = useNavigate();
-
-    function goToModel(mod_id){
-        navigate("/model/" + mod_id);
+class ModelSquares extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            squares_load_failed: false,
+            squares: [],
+        };
+        this.getSquares();
     }
 
-    function makeSquare(item){
+    async getSquares() {
+        let url = BACKEND_URL + "/info/manifest"
+        console.log(url)
+        try {
+            const response = await fetch(url);
+            const myJson = await response.json(); //extract JSON from the http response
+        
+            // "Cannot modify state directly", hence setState
+            this.setState({ squares: myJson });
+        } 
+        catch (error) {
+            console.error(error);
+            this.setState({ squares_load_failed: true });
+        }
+    }
+
+    makeSquare(item) {
+        let url = "/model/" + item.id
+        // Note that the link is used instead of some onclick because props/state is hard
         return (
-            <div className="Square"
-                onClick={() => goToModel(item.id)}>
-                {item.name}
-            </div>
+            <Link to={url} key={item.id}>
+                <div className="Square" key={item.id}>
+                    {item.name}
+                </div>
+            </Link>
         );
     }
 
-    const listItems = props.items.map(makeSquare);
-    return (
-        <div className="SquareGridContainer">{listItems}</div>
-    )
+    render() {
+        if (this.state.squares.length === 0 && this.state.squares_load_failed === false){
+            return (
+                <div>Loading squares...</div>
+            )
+        }
+        else if (this.state.squares_load_failed === true){
+            return (
+                <div>Squares failed to load. Try again.</div>
+            )
+        }
+        else{
+            const listItems = this.state.squares.map(this.makeSquare);
+            return (
+                <div className="SquareGridContainer">{listItems}</div>
+            )
+        }
+    }
+
 }
 
 export default ModelSquares;
