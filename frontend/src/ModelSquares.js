@@ -14,7 +14,7 @@ class ModelSquares extends Component {
     }
 
     async getSquares() {
-        let url = BACKEND_URL + "/info/manifest"
+        let url = BACKEND_URL + "info/manifest"
         console.log(url)
         try {
             const response = await fetch(url);
