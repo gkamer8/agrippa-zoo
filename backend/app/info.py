@@ -40,7 +40,6 @@ def model():
     if not model_id:
         return "A rollicking band of pirates we who tire of tossing on the sea"
     
-    print(model_id)
     db = get_db()
     model_info = db.execute(
         "SELECT id, author_name, name, short_desc FROM models WHERE id=?", (model_id,)
