@@ -29,10 +29,9 @@ def get_folder_manifest_from_s3(path):
 
 # Matching file extensions for markups
 markup_extens = ['agr', 'xml']
-def get_markup_from_s3(path):
+def get_markup_from_s3(path, download=False):
 
     keys = get_folder_manifest_from_s3(path)
-    print(keys)
     # Find .agr or 
     markup_path = None
     for key in keys:
@@ -57,6 +56,9 @@ def get_markup_from_s3(path):
 
     to_return = make_response(resp_str)
     to_return.headers["Content-Type"] = "application/xml"
+    if download:
+        filename = markup_path.split("/")[-1] if "/" in markup_path else markup_path
+        to_return.headers["Content-Disposition"] = f"attachment; filename=\"{filename}\""
 
     return to_return
 
@@ -69,6 +71,12 @@ def markup():
     if not model_id:
         return "A rollicking band of pirates we who tire of tossing on the sea"
 
+    download = request.args.get('download')
+    try:
+        download = int(download)
+    except:
+        download = False
+
     db = get_db()
     desired = db.execute(
         "SELECT id, s3_storage_path FROM models WHERE id=?", (model_id,)
@@ -78,4 +86,4 @@ def markup():
         return "are trying our hands at burglary"
     
     # desired[1] should be the s3_storage_path
-    return get_markup_from_s3(desired[1])
+    return get_markup_from_s3(desired[1], download=download)

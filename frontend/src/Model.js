@@ -52,6 +52,7 @@ function Model(){
                     <div className='model_name'>{model_name}</div>
                     <div className='author'>{model_author}</div>
                     <div className='short_desc'>{short_desc}</div>
+                    <a href={BACKEND_URL + "download/markup?download=1&id=" + id} download={true}>Download Markup</a>
                 </div>
             </div>
         )
