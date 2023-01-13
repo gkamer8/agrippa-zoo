@@ -1,14 +1,17 @@
+/* Creates a table that can be used as a manifest of models stored on Agrippa */
+
 DROP TABLE IF EXISTS models;
 
 CREATE TABLE models (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     author_name TEXT NOT NULL,
     name TEXT,
-    short_desc TEXT
+    short_desc TEXT,
+    s3_storage_path TEXT /* assuming we know bucket is agrippa-files */
 );
 
-INSERT INTO models (author_name, name, short_desc)
-VALUES ("Gordon Kamer", "Transformer", "A sequence to sequence model that operates on tokens in parallel");
+INSERT INTO models (author_name, name, s3_storage_path, short_desc)
+VALUES ("Gordon Kamer", "Anthropic Toy Model", "anthropic", "A model used in Anthropic's toy model of superposition paper");
 
 INSERT INTO models (author_name, name, short_desc)
 VALUES ("Ryan Linnihan", "ResNet-18", "Small convolutional image model with residual connections");

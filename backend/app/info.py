@@ -3,13 +3,11 @@ from app.db import get_db
 import json
 from flask_cors import cross_origin
 
-bp = Blueprint('info', __name__, url_prefix='/info')
-
 DB_DICT = {
     0: 'id',
     1: 'author_name',
     2: 'name',
-    3: 'short_desc'
+    3: 'short_desc',
 }
 
 def make_dict(row):
@@ -17,6 +15,8 @@ def make_dict(row):
     for i in range(len(row)):
         x[DB_DICT[i]] = row[i]
     return x
+
+bp = Blueprint('info', __name__, url_prefix='/info')
 
 @bp.route('/manifest', methods=['GET'])
 @cross_origin()
