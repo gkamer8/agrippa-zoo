@@ -1,0 +1,46 @@
+@import 'style.css';
+
+a:link { text-decoration: none; }
+a:visited { text-decoration: none; }
+a:hover { text-decoration: none; }
+a:active { text-decoration: none; }
+
+.model-name {
+    text-decoration: underline;
+}
+
+.model-table {
+    text-align: left;
+}
+
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 20px;
+    padding-top: 20px;
+    font-size: 1em;
+}
+
+th {
+    color: var(--accent);
+}
+
+.content-container {
+    text-align: left;
+}
+
+.table-container {
+    display: inline-block;
+    text-align: left;
+    margin-left: 2em;
+    margin-right: 2em;
+}
+
+input {
+    all: unset;
+}
+.search-bar {
+    padding: 10px;
+    font-family: var(--font);
+    background-color: #1a1a1a;
+}

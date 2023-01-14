@@ -1,0 +1,12 @@
+@import 'style.css';
+
+.nav-container {
+    font-family: var(--font);
+    font-size: 1.5em;
+    color: var(--text);
+    padding: 1em;
+    padding-left: 2em;
+    text-align: left;
+    border-bottom: 1px solid white;
+    margin-bottom: 1.5em;
+}

@@ -1,25 +1,17 @@
 import './App.css';
-import ModelSquares from './ModelSquares';
+import ModelBoard from './ModelBoard'
 import Model from './Model';
+import NavBar from './NavBar';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
-const topText = "The following is a collection of architectures for use in Agrippa projects."
 
 function App() {
     return (
         <div className="App">
-            <header className="App-header">
-                <a href="/">
-                    Agrippa Model Zoo
-                </a>
-            </header>
             <BrowserRouter>
+            <NavBar />
                 <Routes>
                     <Route path="/" element={
-                        <div>
-                            <div className='desc'>{topText}</div>
-                            <ModelSquares />
-                        </div>
+                        <ModelBoard />
                     } />
                     <Route path="/model/:id" element={
                         <Model />
