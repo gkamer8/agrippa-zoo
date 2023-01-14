@@ -1,3 +1,5 @@
+@import 'style.css';
+
 a:link { text-decoration: none; }
 a:visited { text-decoration: none; }
 a:hover { text-decoration: none; }
@@ -8,29 +10,11 @@ a {
 }
 
 body {
-  background-color: #151515;
-  color: #f0f0f0;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 .App {
   text-align: center;
   display: block;
-}
-
-.App-header {
-  display: block;
-  padding: 20px;
-  font-size: 2em;
-}
-
-.desc {
-  background-color: rgb(104, 32, 32);
-  display: inline-block;
-  padding: 1em;
-  border-radius: 0px;
-  border-color: grey;
-  border-width: 1px;
-  border-style: solid;
-  color: white;
-  margin-top: 2em;
 }

@@ -2,11 +2,23 @@
 
 .nav-container {
     font-family: var(--font);
-    font-size: 1.5em;
+    font-size: 1em;
     color: var(--text);
     padding: 1em;
-    padding-left: 2em;
+    padding-left: var(--def-margin);
     text-align: left;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid var(--text);
     margin-bottom: 1.5em;
+}
+
+.big-text {
+    font-size: 1.5em;
+}
+
+.little-text {
+    margin-left: 2em;
+    
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    
 }

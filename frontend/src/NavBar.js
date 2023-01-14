@@ -6,7 +6,16 @@ function NavBar(props){
     return (
         <div className='nav-container'>
             <Link to="/">
-                Agrippa
+                <span className='big-text'>Agrippa</span>
+            </Link>
+            <Link to="/login">
+                <span className='little-text'>Login</span>
+            </Link>
+            <Link to="/zoo">
+                <span className='little-text'>Zoo</span>
+            </Link>
+            <Link to="/editor">
+                <span className='little-text'>Editor</span>
             </Link>
         </div>
     )

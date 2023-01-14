@@ -25,7 +25,7 @@ def manifest():
     # Translate column numnber into key
     db = get_db()
     manifest = db.execute(
-        "SELECT id, author_name, name, short_desc FROM models"
+        "SELECT id, author_name, name, short_desc FROM models ORDER BY name"
     ).fetchall()
 
     results = [make_dict(row) for row in manifest]

@@ -32,8 +32,8 @@ th {
 .table-container {
     display: inline-block;
     text-align: left;
-    margin-left: 2em;
-    margin-right: 2em;
+    margin-left: var(--def-margin);
+    margin-right: var(--def-margin);
 }
 
 input {
@@ -42,5 +42,5 @@ input {
 .search-bar {
     padding: 10px;
     font-family: var(--font);
-    background-color: #1a1a1a;
+    background-color: var(--impressed);
 }

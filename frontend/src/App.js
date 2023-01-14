@@ -2,15 +2,19 @@ import './App.css';
 import ModelBoard from './ModelBoard'
 import Model from './Model';
 import NavBar from './NavBar';
+import Footer from './Footer';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
     return (
         <div className="App">
             <BrowserRouter>
-            <NavBar />
+                <NavBar />
                 <Routes>
-                    <Route path="/" element={
+                    <Route path="/" element = {
+                        "My home :)"
+                    } />
+                    <Route path="/zoo" element={
                         <ModelBoard />
                     } />
                     <Route path="/model/:id" element={
@@ -21,6 +25,7 @@ function App() {
                     } />
                 </Routes>
             </BrowserRouter>
+            <Footer />
         </div>
     );
 }

@@ -36,7 +36,7 @@ function ModelBoard(props){
 
         if (searchText != ""){
             let newModels = origModels.filter(function(model) {
-                return model.name.indexOf(searchText) !== -1;
+                return model.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
             });
             setModels(newModels);
         }

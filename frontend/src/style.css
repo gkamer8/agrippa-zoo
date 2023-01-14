@@ -3,4 +3,10 @@
     --text: #ffffff;
     --accent: #55b13e;
     --font: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    --def-margin: 2em;
+    --impressed: #1f1f1f;
+}
+
+a {
+    all: reset;
 }

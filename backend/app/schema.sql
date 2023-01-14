@@ -13,6 +13,15 @@ CREATE TABLE models (
 INSERT INTO models (author_name, name, s3_storage_path, short_desc)
 VALUES ("Gordon Kamer", "Anthropic Toy Model", "anthropic", "A model used in Anthropic's toy model of superposition paper");
 
+INSERT INTO models (author_name, name, s3_storage_path, short_desc)
+VALUES ("Gordon Kamer", "Feed Forward Network (FFN)", "ffn", "A simple FFN with Relu activations");
+
+INSERT INTO models (author_name, name, s3_storage_path, short_desc)
+VALUES ("JL Ba, JR Kiros, GE Hinton", "Layer Norm", "layer-norm", "A layer normalization, as seen in Ba, Kiros, Hinton 2016");
+
+INSERT INTO models (author_name, name, s3_storage_path, short_desc)
+VALUES ("Gordon Kamer", "Transformer Decoder", "transformer-decoder", "A decoder-only transformer that accepts as input every constant used in the model.");
+
 INSERT INTO models (author_name, name, short_desc)
 VALUES ("Ryan Linnihan", "ResNet-18", "Small convolutional image model with residual connections");
 

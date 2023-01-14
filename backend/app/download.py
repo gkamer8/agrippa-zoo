@@ -42,7 +42,7 @@ def get_markup_from_s3(path, download=False):
             markup_path = key
 
     if not markup_path:
-        return ""
+        return "A british tar is a soaring soul, as free as a mountain bird."
 
     # Create an S3 client
     s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
@@ -61,6 +61,33 @@ def get_markup_from_s3(path, download=False):
         to_return.headers["Content-Disposition"] = f"attachment; filename=\"{filename}\""
 
     return to_return
+
+
+def get_readme_from_s3(path):
+    keys = get_folder_manifest_from_s3(path)
+    # Find .agr or 
+    md_path = None
+    for key in keys:
+        splitted = key.split('/')[-1]
+        if not splitted:
+            continue
+        if splitted.lower() == "readme.md":
+            md_path = key
+
+    if not md_path:
+        return ""
+
+    # Create an S3 client
+    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+
+    # Retrieve the file
+    response = s3.get_object(Bucket='agrippa-files', Key=md_path)
+
+    # Print the contents of the file
+    resp_bytes = response['Body'].read()
+    resp_str = resp_bytes.decode("utf-8")
+
+    return resp_str
 
 
 @bp.route('/markup', methods=['GET'])
@@ -87,3 +114,24 @@ def markup():
     
     # desired[1] should be the s3_storage_path
     return get_markup_from_s3(desired[1], download=download)
+
+
+@bp.route('/readme', methods=['GET'])
+@cross_origin()
+def readme():
+
+    model_id = request.args.get('id')
+    if not model_id:
+        return "A rollicking band of pirates we who tire of tossing on the sea"
+
+    db = get_db()
+    desired = db.execute(
+        "SELECT id, s3_storage_path FROM models WHERE id=?", (model_id,)
+    ).fetchone()
+
+    if not desired:
+        return "are trying our hands at burglary"
+    
+    # desired[1] should be the s3_storage_path
+    return get_readme_from_s3(desired[1])
+

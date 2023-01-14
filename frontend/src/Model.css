@@ -5,22 +5,32 @@ body {
 }
 
 .model_card {
-    display: inline-block;
-    padding: 1em;
-    border-radius: 0px;
-    border-color: var(--accent);
-    border-width: 5px;
-    border-style: solid;
-    color: var(--text);
-    margin-top: 2em;
     text-align: left;
-    font-family: var(--font);
+    margin-left: var(--def-margin);
+    margin-right: var(--def-margin);
 }
 
-.model_name {
-    font-size: 3em;
+.author {
+    color: var(--accent);
+}
+
+.download-block {
+    margin-top: 1em;
+}
+
+.download-text {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
 }
 
 .short_desc {
-    margin: 2em;
+    margin-top: 1em;
+}
+
+.readme-header {
+    margin-top: 3em;
+    background-color: var(--impressed);
+    display: inline-block;
+    padding: .1em;
+    color: var(--accent);
 }
