@@ -10,6 +10,7 @@ function ModelBoard(props){
     const [modelsLoadFailed, setModelsLoadFailed] = useState(false);
     const [modelsLoaded, setModelsLoaded] = useState(false);
     const [searchText, setSearchText] = useState('');
+    const [canonChecked, setCanonChecked] = useState(false);
 
     useEffect(() => {
 
@@ -42,22 +43,40 @@ function ModelBoard(props){
             let newModels = origModels.filter(function(model) {
                 return model.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
             });
+
+            if (canonChecked){
+                newModels = newModels.filter(function(model) {
+                    return model.canonical;
+                });
+            }
+
             setModels(newModels);
         }
         else {
-            setModels(origModels);
+            let newModels = origModels;
+            if (canonChecked){
+                newModels = newModels.filter(function(model) {
+                    return model.canonical;
+                });
+            }
+            setModels(newModels);
         }
-    }, [searchText, origModels]);
+    }, [searchText, origModels, canonChecked]);
+
 
     function makeSquare(item) {
         let url = "/model/" + item.id
+        let canon = item.canonical ? (<div className='canon'>✓</div>) : ("");
         // Note that the link is used instead of some onclick because props/state is hard
         return (
             <tr key={item.id}>
-                <td className='model-name'>
-                    <Link to={url} key={item.id}>
-                        {item.name}
-                    </Link>
+                <td>
+                    <div className='model-name'>
+                        <Link to={url} key={item.id}>
+                            {item.name}
+                        </Link>
+                    </div>
+                    {canon}
                 </td>
                 <td>
                     {item.author_name}
@@ -71,6 +90,17 @@ function ModelBoard(props){
 
     const handleSearchTextChange = (event) => {
         setSearchText(event.target.value);
+    }
+
+    const canonChange = (event) => {
+        if (!canonChecked){
+            document.getElementsByClassName("canon-button")[0].style.color = "#55b13e";
+        }
+        else {
+            document.getElementsByClassName("canon-button")[0].style.color = "#1f1f1f";
+        }
+
+        setCanonChecked(!canonChecked);
     }
 
     if (modelsLoaded === 0 && modelsLoadFailed === false){
@@ -88,8 +118,12 @@ function ModelBoard(props){
         return (
             <div className='content-container'>
                 <div className='table-container'>
-                    <input type={"text"} onChange={handleSearchTextChange} placeholder="Search..." className="search-bar" />
-                    <br/><br/>
+                    <input type="text" onChange={handleSearchTextChange} placeholder="Search..." className="search-bar" />
+                    <br/>
+                    <div className='search-opts'>
+                        <div className='canon-button' onClick={canonChange}>✓</div>
+                        <span className='canon-label' onClick={canonChange}>Canonical</span>
+                    </div>
                     <table className='model-table'>
                         <thead>
                             <tr>
