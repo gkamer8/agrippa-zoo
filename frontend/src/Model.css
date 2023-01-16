@@ -4,6 +4,11 @@ body {
     background-color: var(--bg);
 }
 
+.model_name {
+    display: inline-block;
+    margin-right: .5em;
+}
+
 .model_card {
     text-align: left;
     margin-left: var(--def-margin);
@@ -33,4 +38,31 @@ body {
     display: inline-block;
     padding: .1em;
     color: var(--accent);
+}
+
+.canonical {
+    background-color: var(--impressed);
+    display: inline-block;
+    padding: .1em;
+    color: var(--accent);
+    margin-bottom: 1em;
+}
+
+.tag-group {
+    display: inline-block;
+    margin-top: 1em;
+    margin-right: 1em;
+}
+
+.tag-group-name {
+    color: var(--accent);
+    margin-bottom: .5em;
+    margin-right: .2em;
+}
+
+.tag {
+    background-color: var(--impressed);
+    color: var(--text);
+    margin-right: .5em;
+    padding: .2em;
 }

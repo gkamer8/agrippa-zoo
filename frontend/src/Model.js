@@ -2,7 +2,7 @@ import { BACKEND_URL } from './Api';
 import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './Model.css';
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown';
 
 
 function Model(){
@@ -18,9 +18,10 @@ function Model(){
     let { id } = useParams();
 
     useEffect(() => {
+
         async function getModel(){
+            console.log("Getting jawn")
             let url = BACKEND_URL + "info/model?id=" + id;
-            console.log(url)
             try {
                 const response = await fetch(url);
                 const myJson = await response.json(); //extract JSON from the http response
@@ -35,26 +36,22 @@ function Model(){
         }
         async function getReadme(){
             let url = BACKEND_URL + "download/readme?id=" + id;
-            console.log(url)
             try {
                 const response = await fetch(url);
                 const myStr = await response.text(); //extract JSON from the http response
             
-                setModelReadme(myStr);
                 setModelReadmeLoaded(true);
+                setModelReadme(myStr);
             } 
             catch (error) {
                 console.error(error);
                 setModelReadmeLoadFailed(true);
             }
         }
-        if (modelLoaded === false){
-            getModel();
-        }
-        if (modelReadmeLoaded === false){
-            getReadme();
-        }
-    })
+        getModel();
+        getReadme();
+
+    }, [id])
 
     if (modelLoaded === false && modelLoadFailed === false){
         return (
@@ -67,28 +64,65 @@ function Model(){
         )
     }
     else{
-        let model_name = modelInfo['name']
-        let model_author = modelInfo['author_name']
-        let short_desc = modelInfo['short_desc']
+        let model_name = modelInfo['name'];
+        let model_author = modelInfo['author_name'];
+        let short_desc = modelInfo['short_desc'];
+        let canonical = modelInfo['canonical'];
+        let tags = JSON.parse(modelInfo['tags']);
         let md_text = modelReadme;
 
         let readme_header = "";
 
+        let canon = ""
+        if (canonical){
+            canon = (
+                <div className='canonical'>Canonical</div>
+            );
+        }
+
+        let tag_arr = []
+        // Go through the tags, make it an array that can be passed like model squares is
+        for (const [key, value] of Object.entries(tags)) {
+            tag_arr.push([key, value])
+        }
+
         // if we're waiting for it to load or it's loaded
-        if(modelReadmeLoaded && md_text != ""){
+        if(modelReadmeLoaded && md_text !== "" && modelReadmeLoadFailed !== true){
             readme_header = (
-                <div className='readme-header'>README.md</div>
+                <div>
+                    <div className='readme-header'>README.md</div>
+                    <br/><br/>
+                </div>
+            );
+        }
+
+        function makeTag(item){
+            return (
+                <span key={item} className="tag">{item}</span>
+            );
+        }
+
+        function makeTagGroup(item){
+            const listTags = item[1].map(makeTag);
+            return (
+                <div className='tag-group' key={item[0]}>
+                    <div className='tag-group-name'>{item[0]}</div>
+                    {listTags}
+                </div>
             );
         }
         
+        const listTagGroups = tag_arr.map(makeTagGroup);
         return (
             <div className='content-container'>
                 <div className='model_card'>
                     <h1 className='model_name'>
                         {model_name}
                     </h1>
+                    {canon}
+
                     <div>
-                        Author: <span className='author'>{model_author}</span>
+                        <span className='author'>Author: </span>{model_author}
                     </div>
                     <div className='download-block'>
                         <a href={BACKEND_URL + "download/markup?download=1&id=" + id} download={true}>
@@ -96,6 +130,7 @@ function Model(){
                         </a>
                     </div>
                     <div className='short_desc'>{short_desc}</div>
+                    {listTagGroups}
                     {readme_header}
                     <ReactMarkdown>
                         {md_text}

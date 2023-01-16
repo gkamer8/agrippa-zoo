@@ -14,14 +14,15 @@ function ModelBoard(props){
     useEffect(() => {
 
         async function getModels() {
+            console.log("Getting models")
             let url = BACKEND_URL + "info/manifest"
             try {
                 const response = await fetch(url);
                 const myJson = await response.json(); //extract JSON from the http response
             
                 // "Cannot modify state directly", hence setState
-                setModels(myJson);
                 setModelsLoaded(true);
+                setModels(myJson);
                 setOrigModels(myJson);
             } 
             catch (error) {
@@ -34,7 +35,10 @@ function ModelBoard(props){
             getModels();
         }
 
-        if (searchText != ""){
+    }, [modelsLoaded]);
+
+    useEffect(() => {
+        if (searchText !== ""){
             let newModels = origModels.filter(function(model) {
                 return model.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
             });
@@ -43,7 +47,7 @@ function ModelBoard(props){
         else {
             setModels(origModels);
         }
-    })
+    }, [searchText, origModels]);
 
     function makeSquare(item) {
         let url = "/model/" + item.id
