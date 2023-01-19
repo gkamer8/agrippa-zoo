@@ -20,6 +20,7 @@ You also need to place a file called `secrets.py` inside `backend/app` with the 
 ```
 AWS_ACCESS_KEY="ASDFBRUHZXCVBN"
 AWS_SECRET_KEY="b/RA1NYnasGAWGajksbdgAWBEoigw1263ebg"
+AUTH_SECRET_KEY="bruh-bruh-bruh"
 ```
 
 On the frontend, you can install the packages and then run the Webpack server using:
