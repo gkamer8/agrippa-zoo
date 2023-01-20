@@ -2,7 +2,7 @@ import './ModelBoard.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { BACKEND_URL } from './Api.js'
-import { TextInput } from './Form';
+import { TextInput, Canonical, Checkmark } from './Form';
 
 function ModelBoard(props){
 
@@ -94,13 +94,6 @@ function ModelBoard(props){
     }
 
     const canonChange = (event) => {
-        if (!canonChecked){
-            document.getElementsByClassName("canon-button")[0].style.color = "#55b13e";
-        }
-        else {
-            document.getElementsByClassName("canon-button")[0].style.color = "#1f1f1f";
-        }
-
         setCanonChecked(!canonChecked);
     }
 
@@ -121,10 +114,7 @@ function ModelBoard(props){
                 <div className='table-container'>
                     <TextInput className={'search-bar'} id='search-bar' onChange={handleSearchTextChange} placeholder="Search..." />
                     <br/>
-                    <div className='search-opts'>
-                        <div className='canon-button' onClick={canonChange}>✓</div>
-                        <span className='canon-label' onClick={canonChange}>Canonical</span>
-                    </div>
+                    <Checkmark onClick={canonChange} label="Canonical" className="search-opts" />
                     <table className='model-table'>
                         <thead>
                             <tr>

@@ -26,3 +26,24 @@
     width: calc(100% - 2 * 10px);
     height: calc(100% - 2 * 10px);
 }
+
+.button {
+    background-color: var(--impressed);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 1em;
+    padding: 10px;
+    cursor: pointer;
+    outline: none;
+    border-width: 0px;
+}
+
+.canon-button {
+    background-color: var(--impressed);
+    color: var(--impressed);
+    padding: .1em;
+    padding-left: .2em;
+    padding-right: .2em;
+    font-size: .75em;
+    display: inline-block;
+}
