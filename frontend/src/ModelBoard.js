@@ -2,6 +2,7 @@ import './ModelBoard.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { BACKEND_URL } from './Api.js'
+import { TextInput } from './Form';
 
 function ModelBoard(props){
 
@@ -118,7 +119,7 @@ function ModelBoard(props){
         return (
             <div className='content-container'>
                 <div className='table-container'>
-                    <input type="text" onChange={handleSearchTextChange} placeholder="Search..." className="search-bar" />
+                    <TextInput className={'search-bar'} id='search-bar' onChange={handleSearchTextChange} placeholder="Search..." />
                     <br/>
                     <div className='search-opts'>
                         <div className='canon-button' onClick={canonChange}>✓</div>

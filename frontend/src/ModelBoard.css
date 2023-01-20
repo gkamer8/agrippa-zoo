@@ -41,11 +41,7 @@ th {
 }
 
 .search-bar {
-    all: unset;
-    padding: 10px;
-    font-family: var(--font);
-    background-color: var(--impressed);
-    text-decoration: none;
+    width: 20em !important;
 }
 
 .canon {

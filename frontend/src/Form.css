@@ -1,0 +1,28 @@
+@import 'style.css';
+
+.text-bar {
+    outline: none;
+    border-width: 0px;
+    padding: 10px;
+    font-family: var(--font);
+    background-color: var(--impressed);
+    text-decoration: none;
+    font-size: 1em;
+    color: var(--text);
+
+    width: calc(100% - 2 * 10px);
+    height: calc(100% - 2 * 10px);
+}
+
+.text-box {
+    outline: none;
+    border-width: 0px;
+    padding: 10px;
+    font-family: var(--font);
+    background-color: var(--impressed);
+    text-decoration: none;
+    font-size: 1em;
+    color: var(--text);
+    width: calc(100% - 2 * 10px);
+    height: calc(100% - 2 * 10px);
+}
