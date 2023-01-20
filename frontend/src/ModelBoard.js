@@ -2,7 +2,7 @@ import './ModelBoard.css';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { BACKEND_URL } from './Api.js'
-import { TextInput, Canonical, Checkmark } from './Form';
+import { TextInput, Checkmark } from './Form';
 
 function ModelBoard(props){
 

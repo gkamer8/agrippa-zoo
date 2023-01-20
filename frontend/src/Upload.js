@@ -1,10 +1,31 @@
 import './Upload.css';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'
-import { BACKEND_URL } from './Api.js'
-import { TextInput, TextBox, Button, Checkmark } from './Form';
+import { TextInput, TextBox, Button, Checkmark, FileUpload } from './Form';
 
 function Upload(props) {
+
+    const [fileUploadIds, setFileUploadIds] = useState([0])
+
+    function getFileUploadForm(id){
+        return (
+            <div className='form-row' key={id}>
+                <FileUpload onChange={handleFileChange} />
+            </div>
+        )
+    }
+
+    function addNewOption(){
+        let x = [...fileUploadIds];
+        x.push(x.length);
+        setFileUploadIds(x);
+        console.log(fileUploadIds);
+    }
+
+    function handleFileChange(){
+        addNewOption();
+    }
+
+
     return (
         <div id="content-container">
             <h1>Upload</h1>
@@ -32,6 +53,9 @@ function Upload(props) {
                 </div>
                 <div className='form-row'>
                     <Checkmark label="Canonical" />
+                </div>
+                <div id="files">
+                    {fileUploadIds.map(getFileUploadForm)}
                 </div>
             </div>
         </div>

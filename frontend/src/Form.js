@@ -1,5 +1,5 @@
 import "./Form.css"
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export function TextInput({className, ...props}){
 
@@ -45,5 +45,23 @@ export function Checkmark({className, label, ...props}){
             <div className='canon-button' onClick={canonClick}>✓</div>
             <span className='canon-label' onClick={canonClick}>{label}</span>
         </div>
+    )
+}
+
+export function FileUpload({className, onChange, ...props}){
+
+    function fileUploadOnChange(e){
+        console.log(e.target.files);
+        if(onChange){
+            onChange();
+        }
+    }
+
+    className = className ? `file-upload-label ${className}` : 'file-upload-label';
+    return (
+        <label className={className}>
+            <input type="file" onChange={fileUploadOnChange} className="file-upload" multiple {...props} />
+            Custom Upload
+        </label>
     )
 }
