@@ -1,21 +1,21 @@
 import './Upload.css';
 import { BACKEND_URL } from './Api';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { TextInput, TextBox, Button, Checkmark, FileUpload } from './Form';
 
 function Upload(props) {
 
-    const [successfullySent, setSuccessfullySent] = useState(false);
+    const [sentStatus, setSentStatus] = useState(0);
     const [fileArray, setFileArray] = useState([]);
     const [inputTags, setInputTags] = useState([]);
     const [outputTags, setOutputTags] = useState([]);
+    const [canonChecked, setCanonChecked] = useState(false);
 
     function handleFileChange(e){
         let fileList = e.target.files;
         let n = fileList.length;
         let newFileArray = [];
         for (let i = 0; i < n; i++){
-            console.log(fileList[i]);
             newFileArray.push(fileList[i]);
         }
         setFileArray(newFileArray);
@@ -52,11 +52,15 @@ function Upload(props) {
     }
 
     async function sendToAPI() {
+
+        setSentStatus(1);
+
         let fileData = new FormData();
 
         let model_name = document.getElementById('model-name').value;
         let author_name = document.getElementById('author-name').value;
         let short_desc = document.getElementById('short-desc').value;
+        let canonical = canonChecked;
         let tagData = getTagFormData();
 
         if (!model_name){
@@ -88,6 +92,7 @@ function Upload(props) {
         fileData.append('author_name', author_name);
         fileData.append('short_desc', short_desc);
         fileData.append('tags', tagData);
+        fileData.append('canonical', canonical);
         for (let i = 0; i < fileArray.length; i++){
             fileData.append('file' + i, fileArray[i]);
         }
@@ -96,17 +101,25 @@ function Upload(props) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
+                headers: {
+                    'x-access-token': localStorage.getItem("auth_token"),
+                },
                 body: fileData
              });
             const myJson = await response.json(); //extract JSON from the http response
 
             console.log(myJson);
 
-            // "Cannot modify state directly", hence setState
-            setSuccessfullySent(true);
+            if (myJson.response === 'failed'){
+                setSentStatus(3);
+            }
+            else {
+                setSentStatus(2);
+            }
         } 
         catch (error) {
             console.error(error);
+            setSentStatus(3);
         }
     }
 
@@ -129,7 +142,7 @@ function Upload(props) {
 
     function makeInputTag(index){
         return (
-            <div className='tag-box'>
+            <div className='tag-box' key={index}>
                 {inputTags[index]} <span onClick={() => deleteInputTag(index)} className='tag-delete'>X</span>
             </div>
         )
@@ -137,7 +150,7 @@ function Upload(props) {
 
     function makeOutputTag(index){
         return (
-            <div className='tag-box'>
+            <div className='tag-box' key={index}>
                 {outputTags[index]} <span onClick={() => deleteOutputTag(index)} className='tag-delete'>X</span>
             </div>
         )
@@ -179,8 +192,43 @@ function Upload(props) {
         document.getElementById("output-tag").value = "";
     }
 
+    const canonChange = (event) => {
+        setCanonChecked(!canonChecked);
+    }
+
+    function handleOutputTagKeyDown(e){
+        if (e.keyCode === 13){  // enter key
+            addOutputTag();
+        }
+    }
+
+    function handleInputTagKeyDown(e){
+        if (e.keyCode === 13){  // enter key
+            addInputTag();
+        }
+    }
+
     const inputTagLabels = [...Array(inputTags.length).keys()].map(makeInputTag);
     const outputTagLabels = [...Array(outputTags.length).keys()].map(makeOutputTag);
+    let statusText = "";
+    if (sentStatus === 0){
+        statusText = "";  // Nothing has happened
+    }
+    else if (sentStatus === 1){
+        statusText = "Submitting...";
+    }
+    else if (sentStatus === 2){
+        return (
+            <div id="content-container">
+                <h1>Upload</h1>
+                Successfully uploaded.
+            </div>
+        )
+    }
+    else if (sentStatus === 3){
+        statusText = "An error occurred; please try again.";
+    }
+
     return (
         <div id="content-container">
             <h1>Upload</h1>
@@ -195,21 +243,21 @@ function Upload(props) {
                     <TextBox id="short-desc" placeholder="Short Description" />
                 </div>
                 <div className='form-row'>
-                    <TextInput id="input-tag" placeholder="Input Tag" />
+                    <TextInput id="input-tag" onKeyDown={handleInputTagKeyDown} placeholder="Input Tag" />
                 </div>
                 <div className='form-row'>
                     <Button onClick={addInputTag} value="Add Input Tag" />
                 </div>
                 {inputTagLabels}
                 <div className='form-row'>
-                    <TextInput id="output-tag" placeholder="Output Tag" />
+                    <TextInput id="output-tag" onKeyDown={handleOutputTagKeyDown} placeholder="Output Tag" />
                 </div>
                 <div className='form-row'>
                     <Button onClick={addOutputTag} value="Add Output Tag" />
                 </div>
                 {outputTagLabels}
                 <div className='form-row'>
-                    <Checkmark label="Canonical" />
+                    <Checkmark label="Canonical" onClick={canonChange} />
                 </div>
                 <div id="files">
                     <div className='form-row'>
@@ -219,7 +267,7 @@ function Upload(props) {
                 <div className='form-row'>
                     <Button value="Submit" onClick={onSubmit} />
                 </div>
-                {successfullySent ? "Submitted" : "Not submitted"}
+                {statusText}
             </div>
         </div>
     );

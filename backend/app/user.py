@@ -22,10 +22,8 @@ def info(current_user):
 
 @bp.route('/upload', methods=['POST'])
 @cross_origin()
-# @token_required
-def upload(current_user = "PLACEHOLDER"):
-
-    return json.dumps({'response': 'failed', 'why': 'not_implemented'})
+@token_required
+def upload(current_user):
 
     model_name = request.form.get('model_name')
     author_name = request.form.get('author_name')
@@ -45,7 +43,7 @@ def upload(current_user = "PLACEHOLDER"):
         return json.dumps({'response': 'failed', 'why': 'missing_canonical'})
 
     try:
-        canonical = int(canonical)
+        canonical = canonical == 'true'
     except ValueError:
         return json.dumps({'response': 'failed', 'why': 'canonical_invalid_type'})
 
@@ -87,8 +85,9 @@ def upload(current_user = "PLACEHOLDER"):
         result = object.put(Body=file_bytes)
 
     sql = """
-    INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags)
+    INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
     VALUES (?,
+            ?,
             ?,
             ?,
             ?,
@@ -98,7 +97,7 @@ def upload(current_user = "PLACEHOLDER"):
     """
 
     # Now add to database
-    db.execute(sql, author_name, model_name, new_name, short_desc, canonical, tags)
+    db.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user))
     db.commit()
 
     return json.dumps({'response': 'succeeded'})

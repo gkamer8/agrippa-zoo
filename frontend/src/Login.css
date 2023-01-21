@@ -1,0 +1,11 @@
+@import 'style.css';
+
+.login-container {
+    text-align: left;
+    margin-left: var(--def-margin);
+    margin-right: var(--def-margin);
+}
+
+.form-row{
+    margin-bottom: 1em;
+}

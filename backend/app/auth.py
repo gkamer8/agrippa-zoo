@@ -5,6 +5,7 @@ import json
 from flask_cors import cross_origin
 from functools import wraps
 import jwt
+
 from .secrets import AUTH_SECRET_KEY
 import datetime
 
@@ -57,6 +58,8 @@ def token_required(f):
 @cross_origin()
 def login():
 
+    print("herasdfe")
+
     username = request.form['username']
     password = request.form['password']
 
@@ -87,9 +90,9 @@ def register():
     error = None
 
     if not username:
-        error = "{'response': 'failed', 'why': 'username_missing'}"
+        error = json.dumps({'response': 'failed', 'why': 'username_missing'})
     elif not password:
-        error = "{'response': 'failed', 'why': 'password_missing'}"
+        error = json.dumps({'response': 'failed', 'why': 'password_missing'})
 
     if error is None:
         try:
@@ -99,8 +102,9 @@ def register():
             )
             db.commit()
         except db.IntegrityError:
-            error = "{'response': 'failed', 'why': 'username_taken'}"
+            print("really?")
+            error = json.dumps({'response': 'failed', 'why': 'username_taken'})
         else:
-            return "{'response': 'succeeded'}"
+            return json.dumps({'response': 'succeeded'})
 
     return error

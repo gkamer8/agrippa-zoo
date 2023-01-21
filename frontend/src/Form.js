@@ -9,6 +9,14 @@ export function TextInput({className, ...props}){
     );
 }
 
+export function PasswordInput({className, ...props}){
+
+    className = className ? `text-bar ${className}` : 'text-bar';
+    return (
+        <input type="password" className={className} {...props}/>
+    );
+}
+
 export function TextBox({className, ...props}){
     className = className ? `text-box ${className}` : 'text-box';
     return (

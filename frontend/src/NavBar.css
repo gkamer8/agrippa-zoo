@@ -13,12 +13,24 @@
 
 .big-text {
     font-size: 1.5em;
+    margin-right: .5em;
 }
 
 .little-text {
-    margin-left: 2em;
+    margin-left: 1em;
+    margin-right: 1em;
     
     text-decoration: underline;
     text-decoration-color: var(--accent);
+
+    display: inline-block;
     
+}
+
+.logout {
+    cursor: pointer;
+}
+
+.login-sensitive {
+    display: inline;
 }

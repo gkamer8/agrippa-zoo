@@ -10,7 +10,8 @@ CREATE TABLE models (
     short_desc TEXT,
     canonical INTEGER,  /* Really a boolean */
     tags TEXT,  /* A dictionary of tags like {"input": ["text", "tokens"], "output": ["distribution"], ...} */
-    s3_storage_path TEXT  /* assuming we know bucket is agrippa-files */
+    s3_storage_path TEXT,  /* assuming we know bucket is agrippa-files */
+    username TEXT
 );
 
 DROP TABLE IF EXISTS users;
@@ -40,7 +41,7 @@ VALUES ("Ryan Linnihan",
         "A simple FFN with Relu activations",
         1,
         '{"input": ["vector"], "output": ["vector"]}',
-        'gkamer',
+        'gkamer'
         );
 
 INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)

@@ -16,7 +16,7 @@ def get_folder_manifest_from_s3(path):
 
     # Retrieve a manifest (basically I think) of the contents of a folder
     # NOTE: bucket hardcoded as agrippa-files
-    result = s3.list_objects_v2(Bucket='agrippa-files', Prefix=path)
+    result = s3.list_objects_v2(Bucket='agrippa-files', Prefix=path + "/")
 
     to_return = []
 
