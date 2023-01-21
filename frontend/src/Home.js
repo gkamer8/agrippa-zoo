@@ -5,8 +5,8 @@ function Home(props){
 
     let message = (
         <div>
-            Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link> or,
-            if you'd like to upload models to the zoo, try <Link to="/register" ><span className='link'>registering</span></Link> for an account or <Link className="link" to="/login" ><span className="link">logging in</span></Link>.
+            Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or
+            if you'd like to upload models to the zoo, try <Link to="/register" ><span className='link'>registering</span></Link> for an account and/or <Link className="link" to="/login" ><span className="link">logging in</span></Link>.
         </div>
     );
 

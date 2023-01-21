@@ -2,9 +2,14 @@
     --bg: #2f2f2f;
     --text: #ffffff;
     --accent: #55b13e;
-    --font: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    --font: 'Ubuntu';
     --def-margin: 2em;
     --impressed: #1f1f1f;
+}
+
+@font-face {
+    font-family: 'Ubuntu';
+    src: url("resources/Ubuntu-R.ttf");
 }
 
 a {
