@@ -50,18 +50,36 @@ export function Checkmark({className, label, ...props}){
 
 export function FileUpload({className, onChange, ...props}){
 
+    const [chosenFileNames, setChosenFileNames] = useState([]);
     function fileUploadOnChange(e){
-        console.log(e.target.files);
+        let fileList = e.target.files;
+        let n = fileList.length;
+        let newChosenFileNames = []
+        for (let i = 0; i < n; i++){
+            newChosenFileNames.push(fileList[i].name);
+        }
+        setChosenFileNames(newChosenFileNames);
         if(onChange){
-            onChange();
+            onChange(e);
         }
     }
 
-    className = className ? `file-upload-label ${className}` : 'file-upload-label';
+    function makeFileNameLabel(name){
+        return (
+            <div className="chosen-filename" key={name}>{name}</div>
+        )
+    }
+
+    const uploadedNames = chosenFileNames.length === 0 ? "No files selected." : chosenFileNames.map(makeFileNameLabel)
     return (
-        <label className={className}>
-            <input type="file" onChange={fileUploadOnChange} className="file-upload" multiple {...props} />
-            Custom Upload
-        </label>
+        <div className={className}>
+            <label className='file-upload-label'>
+                <input type="file" onChange={fileUploadOnChange} className="file-upload" multiple {...props} />
+                Upload Files
+            </label>
+            <div className='file-upload-filenames'>
+                {uploadedNames}
+            </div>
+        </div>
     )
 }

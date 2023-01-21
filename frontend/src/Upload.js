@@ -1,62 +1,225 @@
 import './Upload.css';
-import { useState, useEffect } from 'react';
+import { BACKEND_URL } from './Api';
+import { useEffect, useState } from 'react';
 import { TextInput, TextBox, Button, Checkmark, FileUpload } from './Form';
 
 function Upload(props) {
 
-    const [fileUploadIds, setFileUploadIds] = useState([0])
+    const [successfullySent, setSuccessfullySent] = useState(false);
+    const [fileArray, setFileArray] = useState([]);
+    const [inputTags, setInputTags] = useState([]);
+    const [outputTags, setOutputTags] = useState([]);
 
-    function getFileUploadForm(id){
+    function handleFileChange(e){
+        let fileList = e.target.files;
+        let n = fileList.length;
+        let newFileArray = [];
+        for (let i = 0; i < n; i++){
+            console.log(fileList[i]);
+            newFileArray.push(fileList[i]);
+        }
+        setFileArray(newFileArray);
+        // addNewOption();
+    }
+
+    function getTagFormData(){
+        let inputTagString = "["
+        for (let i = 0; i < inputTags.length; i++){
+            if(i === inputTags.length - 1){
+                inputTagString += "\"" + inputTags[i] + "\"";
+            }
+            else {
+                inputTagString += "\"" + inputTags[i] + "\", ";
+            }
+        }
+        inputTagString += "]"
+
+        let outputTagString = "["
+        for (let i = 0; i < outputTags.length; i++){
+            if(i === outputTags.length - 1){
+                outputTagString += "\"" + outputTags[i] + "\"";
+            }
+            else {
+                outputTagString += "\"" + outputTags[i] + "\", ";
+            }
+        }
+        outputTagString += "]"
+        return `{"input": ${inputTagString}, "output": ${outputTagString}}`;
+    }
+
+    function notifyMissing(name){
+        alert(`Missing ${name}`);
+    }
+
+    async function sendToAPI() {
+        let fileData = new FormData();
+
+        let model_name = document.getElementById('model-name').value;
+        let author_name = document.getElementById('author-name').value;
+        let short_desc = document.getElementById('short-desc').value;
+        let tagData = getTagFormData();
+
+        if (!model_name){
+            notifyMissing("model name");
+            return;
+        }
+        else if (!author_name){
+            notifyMissing("author name");
+            return;
+        }
+        else if (!short_desc){
+            notifyMissing("short description");
+            return;
+        }
+        else if (inputTags.length === 0){
+            notifyMissing("input tags");
+            return;
+        }
+        else if (outputTags.length === 0){
+            notifyMissing("output tags");
+            return;
+        }
+        else if (fileArray.length === 0){
+            notifyMissing("file(s)");
+            return;
+        }
+
+        fileData.append('model_name', model_name);
+        fileData.append('author_name', author_name);
+        fileData.append('short_desc', short_desc);
+        fileData.append('tags', tagData);
+        for (let i = 0; i < fileArray.length; i++){
+            fileData.append('file' + i, fileArray[i]);
+        }
+
+        let url = BACKEND_URL + "user/upload"
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: fileData
+             });
+            const myJson = await response.json(); //extract JSON from the http response
+
+            console.log(myJson);
+
+            // "Cannot modify state directly", hence setState
+            setSuccessfullySent(true);
+        } 
+        catch (error) {
+            console.error(error);
+        }
+    }
+
+    function onSubmit(){
+        sendToAPI();
+        console.log("Sending...")
+    }
+
+    function deleteInputTag(index){
+        let newInputTags = [...inputTags];
+        newInputTags.splice(index, 1);
+        setInputTags(newInputTags);
+    }
+
+    function deleteOutputTag(index){
+        let newOutputTags = [...outputTags];
+        newOutputTags.splice(index, 1);
+        setOutputTags(newOutputTags);
+    }
+
+    function makeInputTag(index){
         return (
-            <div className='form-row' key={id}>
-                <FileUpload onChange={handleFileChange} />
+            <div className='tag-box'>
+                {inputTags[index]} <span onClick={() => deleteInputTag(index)} className='tag-delete'>X</span>
             </div>
         )
     }
 
-    function addNewOption(){
-        let x = [...fileUploadIds];
-        x.push(x.length);
-        setFileUploadIds(x);
-        console.log(fileUploadIds);
+    function makeOutputTag(index){
+        return (
+            <div className='tag-box'>
+                {outputTags[index]} <span onClick={() => deleteOutputTag(index)} className='tag-delete'>X</span>
+            </div>
+        )
     }
 
-    function handleFileChange(){
-        addNewOption();
+    function addInputTag(){
+        let tag = document.getElementById("input-tag").value;
+
+        if (!tag){
+            return;
+        }
+
+        if (tag.indexOf("\"") !== -1){
+            alert("You cannot place a quotation mark inside a tag.")
+            return;
+        }
+
+        let newInputTags = [...inputTags];
+        newInputTags.push(tag);
+        setInputTags(newInputTags);
+        document.getElementById("input-tag").value = "";
     }
 
+    function addOutputTag(){
+        let tag = document.getElementById("output-tag").value;
 
+        if (!tag){
+            return;
+        }
+
+        if (tag.indexOf("\"") !== -1){
+            alert("You cannot place a quotation mark inside a tag.")
+            return;
+        }
+
+        let newOutputTags = [...outputTags];
+        newOutputTags.push(tag);
+        setOutputTags(newOutputTags);
+        document.getElementById("output-tag").value = "";
+    }
+
+    const inputTagLabels = [...Array(inputTags.length).keys()].map(makeInputTag);
+    const outputTagLabels = [...Array(outputTags.length).keys()].map(makeOutputTag);
     return (
         <div id="content-container">
             <h1>Upload</h1>
             <div id="upload-form">
                 <div className='form-row'>
-                    <TextInput placeholder="Model Name" />
+                    <TextInput id="model-name" placeholder="Model Name" />
                 </div>
                 <div className='form-row'>
-                    <TextInput placeholder="Author Name" />
+                    <TextInput id="author-name" placeholder="Author Name" />
                 </div>
                 <div className='form-row'>
-                    <TextBox placeholder="Short Description" />
+                    <TextBox id="short-desc" placeholder="Short Description" />
                 </div>
                 <div className='form-row'>
-                    <TextInput placeholder="Input Tag" />
+                    <TextInput id="input-tag" placeholder="Input Tag" />
                 </div>
                 <div className='form-row'>
-                    <Button value="Add Input Tag" />
+                    <Button onClick={addInputTag} value="Add Input Tag" />
+                </div>
+                {inputTagLabels}
+                <div className='form-row'>
+                    <TextInput id="output-tag" placeholder="Output Tag" />
                 </div>
                 <div className='form-row'>
-                    <TextInput placeholder="Output Tag" />
+                    <Button onClick={addOutputTag} value="Add Output Tag" />
                 </div>
-                <div className='form-row'>
-                    <Button value="Add Output Tag" />
-                </div>
+                {outputTagLabels}
                 <div className='form-row'>
                     <Checkmark label="Canonical" />
                 </div>
                 <div id="files">
-                    {fileUploadIds.map(getFileUploadForm)}
+                    <div className='form-row'>
+                        <FileUpload id="file-selector" onChange={handleFileChange} />
+                    </div>
                 </div>
+                <div className='form-row'>
+                    <Button value="Submit" onClick={onSubmit} />
+                </div>
+                {successfullySent ? "Submitted" : "Not submitted"}
             </div>
         </div>
     );

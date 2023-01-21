@@ -23,40 +23,44 @@ CREATE TABLE users (
 
 /* Produce examples for the models table */
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
 VALUES ("Gordon Kamer",
         "Anthropic Toy Model",
         "anthropic",
         "A model used in Anthropic's toy model of superposition paper",
         0,
-        '{}'
+        '{}',
+        'gkamer'
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
 VALUES ("Ryan Linnihan",
         "Feed Forward Network (FFN)",
         "ffn",
         "A simple FFN with Relu activations",
         1,
-        '{"input": ["vector"], "output": ["vector"]}'
+        '{"input": ["vector"], "output": ["vector"]}',
+        'gkamer',
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
 VALUES ("Jared Simpson",
         "Layer Norm",
         "layer-norm",
         "A layer normalization, as seen in Ba, Kiros, Hinton 2016",
         1,
-        '{"input": ["matrix", "activations"], "output": ["matrix", "activations"]}'
+        '{"input": ["matrix", "activations"], "output": ["matrix", "activations"]}',
+        'gkamer'
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
 VALUES ("Gordon Kamer",
         "Transformer Decoder",
         "transformer-decoder",
         "A decoder-only transformer that accepts as input every constant used in the model.",
         1,
-        '{"input": ["text", "tokens"], "output": ["distribution"]}'
+        '{"input": ["text", "tokens"], "output": ["distribution"]}',
+        'gkamer'
         );
 
 /* And now for users */

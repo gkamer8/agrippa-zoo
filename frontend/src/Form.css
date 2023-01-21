@@ -58,3 +58,13 @@
     cursor: pointer;
     display: inline-block;
 }
+
+.chosen-filename {
+    color: var(--accent);
+    margin-top: 1em;
+}
+
+.file-upload-filenames {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}

@@ -38,7 +38,7 @@ def token_required(f):
             token = request.headers['x-access-token']
  
         if not token:
-            return json.dumps({'response': 'failed', 'why': 'a valid token is missing'})
+            return json.dumps({'response': 'failed', 'why': 'token_missing'})
         try:
             data = jwt.decode(token, AUTH_SECRET_KEY, algorithms=[AUTH_ALGO])
             db = get_db()
@@ -47,7 +47,7 @@ def token_required(f):
             ).fetchone()
             current_user = match[0]
         except:
-            return json.dumps({'response': 'failed', 'why': 'token is invalid'})
+            return json.dumps({'response': 'failed', 'why': 'token_invalid'})
  
         return f(current_user, *args, **kwargs)
    return decorator

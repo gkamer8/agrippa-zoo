@@ -9,3 +9,18 @@
 .form-row {
     margin-bottom: 1em;
 }
+
+.tag-box {
+    color: var(--accent);
+    margin-bottom: 1em;
+}
+
+.tag-delete {
+    background-color: var(--impressed);
+    color: var(--accent);
+    padding: .25em;
+    padding-right: .5em;
+    padding-left: .5em;
+    font-size: .75em;
+    cursor: pointer;
+}
