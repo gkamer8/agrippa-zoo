@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { TextInput, PasswordInput, Button } from "./Form";
 import { BACKEND_URL } from "./Api";
+import { useNavigate } from 'react-router-dom';
 import "./Login.css"
-import { useNavigate } from "react-router-dom";
+
 
 function Login(props){
+
+    const navigate = useNavigate();
 
     // 0 = not submitted
     // 1 = response loading
@@ -14,8 +17,6 @@ function Login(props){
     const [regStatus, setRegStatus] = useState(0);
     const [regNotes, setRegNotes] = useState("");
     const [notes, setNotes] = useState("");
-
-    const navigate = useNavigate();
 
     async function sendReq() {
         let username = document.getElementById("username").value;
@@ -37,6 +38,7 @@ function Login(props){
                 setLoginStatus(2);
                 localStorage.setItem("auth_token", myJson.token);
                 localStorage.setItem("username", username);
+                props.handleLogin();
                 navigate("/");
             }
             else {

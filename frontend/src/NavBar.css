@@ -9,6 +9,8 @@
     text-align: left;
     border-bottom: 1px solid var(--text);
     margin-bottom: 1.5em;
+
+    display: flex;
 }
 
 .big-text {
@@ -19,16 +21,13 @@
 .little-text {
     margin-left: 1em;
     margin-right: 1em;
-    
+    padding-top: .3em;  /* this is mostly to do with the Big Text not being an image, yet */
+    vertical-align: middle;
+
     text-decoration: underline;
     text-decoration-color: var(--accent);
 
     display: inline-block;
-    
-}
-
-.logout {
-    cursor: pointer;
 }
 
 .login-sensitive {

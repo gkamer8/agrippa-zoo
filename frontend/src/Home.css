@@ -1,0 +1,11 @@
+@import 'style.css';
+
+#home-container{
+    text-align: left;
+    margin-left: var(--def-margin);
+    margin-right: var(--def-margin);
+}
+
+.link {
+    text-decoration: underline;
+}

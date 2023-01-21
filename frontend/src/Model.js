@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 
 
 function Model(){
@@ -128,6 +129,9 @@ function Model(){
                         <a href={BACKEND_URL + "download/markup?download=1&id=" + id} download={true}>
                             <span className='download-text'>Download Markup</span>
                         </a>
+                    </div>
+                    <div className='download-block'>
+                        <Link to={"/workspace/" + id}><span className='download-text'>View in Workspace</span></Link>
                     </div>
                     <div className='short_desc'>{short_desc}</div>
                     {listTagGroups}

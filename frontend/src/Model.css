@@ -25,7 +25,7 @@ body {
 
 .download-text {
     text-decoration: underline;
-    text-decoration-color: var(--accent);
+    text-decoration-color: var(--text);
 }
 
 .short_desc {

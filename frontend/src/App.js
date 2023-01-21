@@ -5,17 +5,56 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 import Upload from './Upload';
 import Login from './Login';
+import Workspace from './Workspace';
+import Home from './Home';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function App() {
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState(null);
+
+    function RequireAuth ({children}) {
+        if (!isLoggedIn) {
+           return <Navigate to="/login" replace />;
+        }
+        return children;
+    }
+
+    function handleLogout() {
+        localStorage.clear();
+        setUsername(null);
+        setIsLoggedIn(false);
+    }
+
+    function handleLogin(){
+        setIsLoggedIn(true);
+        let username = localStorage['username'];
+        setUsername(username);
+    }
+
+    function setLogin(){
+        let auth_token = localStorage['auth_token'];
+        if (auth_token){
+            setIsLoggedIn(true);
+        }
+        else {
+            setIsLoggedIn(false);
+        }
+    }
+
+    useEffect(() => {
+        setLogin();
+    }, [])
 
     return (
         <div className="App">
             <BrowserRouter>
-                <NavBar />
+                <NavBar isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
                 <Routes>
                     <Route path="/" element = {
-                        "My home :)"
+                        <Home isLoggedIn={isLoggedIn} username={username} />
                     } />
                     <Route path="/zoo" element={
                         <ModelBoard />
@@ -29,7 +68,13 @@ function App() {
                         </RequireAuth>
                     } />
                     <Route path="/login" element={
-                        <Login />
+                        <Login handleLogin={handleLogin} />
+                    } />
+                    <Route path="/register" element={
+                        <Login handleLogin={handleLogin} />
+                    } />
+                    <Route path="/workspace/:id" element={
+                        <Workspace />
                     } />
                     <Route path="*" element = {
                         <div>NOT FOUND</div>
@@ -39,19 +84,6 @@ function App() {
             <Footer />
         </div>
     );
-}
-
-function getToken() {
-    const tokenString = localStorage.getItem('auth_token');
-    return tokenString
-}
-  
-function RequireAuth ({children}) {
-    const userIsLogged = getToken(); // Your hook to get login status
-    if (!userIsLogged) {
-       return <Navigate to="/login" replace />;
-    }
-    return children;
 }
 
 export default App;

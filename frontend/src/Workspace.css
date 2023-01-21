@@ -1,0 +1,12 @@
+#workspace-container {
+    height: 50em;
+    text-align: center;
+}
+
+#flow-container {
+    height: 100%;
+    width: calc(75% - 10px);
+    margin: auto;
+
+    border: 5px solid white;
+}
