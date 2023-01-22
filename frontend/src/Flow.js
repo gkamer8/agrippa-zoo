@@ -12,7 +12,7 @@ import dagre from 'dagre';
 
 const initialNodes = [];
 
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }, { id: 'e2-3', source: '0', target: '1' }];
+const initialEdges = [];
 // const initialEdges = [];
 
 const exampleFileText = `
@@ -288,42 +288,132 @@ function Flow(props) {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [fileText] = useState(exampleFileText);
+    const [details, setDetails] = useState(undefined);
 
 
     useEffect(() => {
 
         function makeNodeFromTag(el, id) {
-            //let rootChildren = el.children;
             let attrs = el.attributes;
+            
+            if (el.nodeName === 'import'){
+                let name = attrs['from'].value;
+                return { id: id, position: { x: 0, y: 0 }, data: { label: name }, type: 'input', el: el }
+            }
+            else if (el.nodeName === 'export'){
+                let name = attrs['from'].value;
+                return { id: id, position: { x: 0, y: 0 }, data: { label: name }, type: 'output', el: el }
+            }
+
             let title = `Untitled ${el.nodeName}`;
             if (attrs['title']){
                 title = attrs['title'].value;
             }
 
-            return { id: id+"", position: { x: 0, y: 0 }, data: { label: title }, el: el }
+            return { id: id, position: { x: 0, y: 0 }, data: { label: title }, el: el }
         }
 
         // xmlDoc is a "Document" received from parser.parseFromString
-        function getNodesFromXMLObj(modelDoc) {
+        function getNodesAndEdgesFromXMLObj(modelDoc) {
     
+            let inputToNode = {}  // input name -> array of block ids
+            let outputFromNode = {}  // output name -> array of block ids
+
             let rootChildren = modelDoc.children;
             let newNodes = []
+            let newEdges = []
             let k = 0;
             for (let i = 0; i < rootChildren.length; i++){
                 if (rootChildren[i].nodeName === 'block' || rootChildren[i].nodeName === 'node'){
-                    newNodes.push(makeNodeFromTag(rootChildren[i], k));
+                    newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
+                    // Find input and output names and add to inputToNode, outputFromNode dicts
+                    let inputs = rootChildren[i].querySelectorAll("*>input");
+                    for (let j = 0; j < inputs.length; j++){
+                        let src = inputs[j].attributes['src'].value;
+                        if (inputToNode[src]){
+                            if (!inputToNode[src].includes(k+"")){
+                                inputToNode[src].push(k+"");
+                            }
+                        }
+                        else {
+                            inputToNode[src] = [k+""];
+                        }
+                    }
+                    let outputs = rootChildren[i].querySelectorAll("*>output");
+                    for (let j = 0; j < outputs.length; j++){
+                        let src = outputs[j].attributes['name'].value;
+                        // Note: output names should be unique, so everything should go to the 'else' block
+                        //      both blocks included now just in case that becomes not true in the future
+                        if (outputFromNode[src]){
+                            if (!outputFromNode[src].includes(k+"")){
+                                outputFromNode[src].push(k+"");
+                            }
+                        }
+                        else {
+                            outputFromNode[src] = [k+""];
+                        }
+                    }
+
+                    // Also grab exports for good measure; these will be repeats except for sourced blocks,
+                    //  ... for now
+                    let exports = rootChildren[i].querySelectorAll("*>export");
+                    for (let j = 0; j < exports.length; j++){
+                        let src = exports[j].attributes['from'].value;
+                        // Note: output names should be unique, so everything should go to the 'else' block
+                        //      both blocks included now just in case that becomes not true in the future
+                        if (outputFromNode[src]){
+                            if (!outputFromNode[src].includes(k+"")){
+                                outputFromNode[src].push(k+"");
+                            }
+                        }
+                        else {
+                            outputFromNode[src] = [k+""];
+                        }
+                    }
+                    k++;
+                }
+                else if (rootChildren[i].nodeName === 'import'){
+                    let name = rootChildren[i].attributes['from'].value;
+                    outputFromNode[name] = [k+""];
+                    newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
+                    k++;
+                }
+                else if (rootChildren[i].nodeName === 'export'){
+                    let name = rootChildren[i].attributes['from'].value;
+                    inputToNode[name] = [k+""];
+                    newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
                     k++;
                 }
             }
-            return newNodes;
+            // Go through outputs, make edges from output block to all blocks with that input
+            let existingEdges = {} // dictionary of "id->id"->true
+            for (const key in outputFromNode) {
+                if (inputToNode[key]){
+                    let outputs = outputFromNode[key];
+                    for (let i = 0; i < outputs.length; i++){
+                        let inputs = inputToNode[key];
+                        for (let k = 0; k < inputs.length; k++){
+                            let arrowStr = outputs[i]+"->"+inputs[k];
+                            if (!existingEdges[arrowStr] && outputs[i] !== inputs[k]){
+                                let newEdge = { id: arrowStr, source: outputs[i], target: inputs[k] };
+                                newEdges.push(newEdge);
+                                existingEdges[arrowStr] = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return [newNodes, newEdges];
         }
 
-        function arrangeNodes(nodes){
+        function arrangeNodes(nodes, edges){
             let g = new dagre.graphlib.Graph();
             g.setGraph({});
             g.setDefaultEdgeLabel(function() { return {}; });
             for (let i = 0; i < nodes.length; i++){
-                // 150 and 50 are literally just heuristics; I had a hard time figuring out how to retrieve height/width data
+                // 150 and 50 are literally just heuristics; I had a hard time figuring out how
+                //  to retrieve height/width data
                 g.setNode(nodes[i].id, {width: 150, height: 50});
             }
     
@@ -348,14 +438,37 @@ function Flow(props) {
 
         let modelDoc = xmlDoc.documentElement;
 
-        let newNodes = getNodesFromXMLObj(modelDoc);
-        newNodes = arrangeNodes(newNodes);
-        console.log(newNodes)
+        let newNodesAndEdges = getNodesAndEdgesFromXMLObj(modelDoc);
+        let newNodes = newNodesAndEdges[0];
+        let newEdges = newNodesAndEdges[1];
+        newNodes = arrangeNodes(newNodes, newEdges);
         setNodes(newNodes);
-    }, [fileText, setNodes, edges])
+        setEdges(newEdges)
+    }, [fileText, setNodes, setEdges])
 
     function onNodeClick(event, node){
-        console.log(node.el);
+        function makeAttrRow(attr){
+            return (
+                <div className='attr-row' key={attr[2]+""}>
+                    <span className='attr-name'>{attr[0]}</span>: <span className='attr-value'>{attr[1]}</span>
+                </div>
+            );
+        }
+
+        let attrArr = []
+        let attrs = node.el.attributes;
+        for (var i=0; i<attrs.length; i++) {
+            var attrib = attrs[i];
+            // use attrib.name and attrib.value to get key value pairs
+            attrArr.push([attrib.name, attrib.value, i]);
+        }
+        let attrMap = attrArr.map(makeAttrRow);
+        let newDetails = (
+            <div id="detail-attrs">
+                {attrMap}
+            </div>
+        );
+        setDetails(newDetails);
     }
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
@@ -378,6 +491,7 @@ function Flow(props) {
                 <h2>
                     Details
                 </h2>
+                {details}
             </div>
         </div>
     );

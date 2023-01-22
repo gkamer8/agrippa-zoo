@@ -1,5 +1,21 @@
+@import "./style.css";
+
 #menu{
     width: 20%;
     text-align: left;
     padding: 1em;
+}
+
+.attr-row {
+    background-color: var(--impressed);
+    margin-bottom: 1em;
+    padding: .25em;
+}
+
+.attr-name {
+    color: var(--accent);
+}
+
+.attr-value {
+    font-family:'Courier New', Courier, monospace;
 }
