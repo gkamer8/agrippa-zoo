@@ -11,7 +11,8 @@ CREATE TABLE models (
     canonical INTEGER,  /* Really a boolean */
     tags TEXT,  /* A dictionary of tags like {"input": ["text", "tokens"], "output": ["distribution"], ...} */
     s3_storage_path TEXT,  /* assuming we know bucket is agrippa-files */
-    username TEXT
+    username TEXT,
+    file_index TEXT  /* The index .agr file */
 );
 
 DROP TABLE IF EXISTS users;
@@ -24,44 +25,48 @@ CREATE TABLE users (
 
 /* Produce examples for the models table */
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
 VALUES ("Gordon Kamer",
         "Anthropic Toy Model",
         "anthropic",
         "A model used in Anthropic's toy model of superposition paper",
         0,
         '{}',
-        'gkamer'
+        'gkamer',
+        'anthropic.agr'
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
 VALUES ("Ryan Linnihan",
         "Feed Forward Network (FFN)",
         "ffn",
         "A simple FFN with Relu activations",
         1,
         '{"input": ["vector"], "output": ["vector"]}',
-        'gkamer'
+        'gkamer',
+        'ffn.agr'
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
 VALUES ("Jared Simpson",
         "Layer Norm",
         "layer-norm",
         "A layer normalization, as seen in Ba, Kiros, Hinton 2016",
         1,
         '{"input": ["matrix", "activations"], "output": ["matrix", "activations"]}',
-        'gkamer'
+        'gkamer',
+        'layernorm.agr'
         );
 
-INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
 VALUES ("Gordon Kamer",
         "Transformer Decoder",
         "transformer-decoder",
         "A decoder-only transformer that accepts as input every constant used in the model.",
         1,
         '{"input": ["text", "tokens"], "output": ["distribution"]}',
-        'gkamer'
+        'gkamer',
+        'decoder.agr'
         );
 
 /* And now for users */

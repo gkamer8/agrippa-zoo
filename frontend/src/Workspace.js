@@ -53,14 +53,14 @@ function Workspace(props){
                 </div>
             ) 
         }
-    }, [modelInfo, modelLoadFailed, modelLoaded])
+    }, [modelInfo, modelLoadFailed, modelLoaded, id])
 
     return (
         <div id="workspace-container">
             {modelInfoBox}
             <div id="editor-and-options">
                 <div id="flow-container">
-                    <Flow />
+                    <Flow id={id} />
                 </div>
             </div>
         </div>

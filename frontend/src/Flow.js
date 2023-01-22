@@ -290,6 +290,8 @@ function Flow(props) {
     const [fileText] = useState(exampleFileText);
     const [details, setDetails] = useState(undefined);
 
+    const id = props.id;
+    console.log(id);
 
     useEffect(() => {
 
