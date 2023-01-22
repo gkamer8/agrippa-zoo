@@ -1,12 +1,23 @@
+@import './style.css';
+
 #workspace-container {
-    height: 50em;
-    text-align: center;
+    margin-left: var(--def-margin);
+    margin-right: var(--def-margin);
 }
 
 #flow-container {
     height: 100%;
-    width: calc(75% - 10px);
+    width: 100%;
     margin: auto;
+}
 
-    border: 5px solid white;
+#editor-and-options {
+    display: flex;
+    height: 50em;
+}
+
+#model-info{
+    text-align: left;
+    background-color: var(--impressed);
+    padding: .5em;
 }

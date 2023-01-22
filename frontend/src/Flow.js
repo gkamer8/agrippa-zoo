@@ -303,11 +303,8 @@ function Flow(props) {
         }
 
         // xmlDoc is a "Document" received from parser.parseFromString
-        function getNodesFromXML(fileText) {
-            let parser = new DOMParser();
-            let xmlDoc = parser.parseFromString(fileText, "text/xml");
-
-            let modelDoc = xmlDoc.documentElement;
+        function getNodesFromXMLObj(modelDoc) {
+    
             let rootChildren = modelDoc.children;
             let newNodes = []
             let k = 0;
@@ -325,7 +322,8 @@ function Flow(props) {
             g.setGraph({});
             g.setDefaultEdgeLabel(function() { return {}; });
             for (let i = 0; i < nodes.length; i++){
-                g.setNode(nodes[i].id, {width: 100, height: 100});
+                // 150 and 50 are literally just heuristics; I had a hard time figuring out how to retrieve height/width data
+                g.setNode(nodes[i].id, {width: 150, height: 50});
             }
     
             for (let i = 0; i < edges.length; i++){
@@ -344,7 +342,12 @@ function Flow(props) {
             return arrangedNodes;
         }
 
-        let newNodes = getNodesFromXML(fileText);
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(fileText, "text/xml");
+
+        let modelDoc = xmlDoc.documentElement;
+
+        let newNodes = getNodesFromXMLObj(modelDoc);
         newNodes = arrangeNodes(newNodes);
         console.log(newNodes)
         setNodes(newNodes);
