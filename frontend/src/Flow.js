@@ -7,6 +7,7 @@ import ReactFlow, {
     addEdge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import './Flow.css';
 import dagre from 'dagre';
 
 const initialNodes = [];
@@ -299,7 +300,7 @@ function Flow(props) {
                 title = attrs['title'].value;
             }
 
-            return { id: id+"", position: { x: 0, y: 0 }, data: { label: title } }
+            return { id: id+"", position: { x: 0, y: 0 }, data: { label: title }, el: el }
         }
 
         // xmlDoc is a "Document" received from parser.parseFromString
@@ -353,19 +354,29 @@ function Flow(props) {
         setNodes(newNodes);
     }, [fileText, setNodes, edges])
 
-    const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+    function onNodeClick(event, node){
+        console.log(node.el);
+    }
 
     return (
-        <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-        >
-            <Controls />
-            <Background />
-        </ReactFlow>
+        <div style={{ width:'100%', height: '100%', display: 'flex'}}>
+
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onNodeClick={onNodeClick}
+            >
+                <Controls />
+                <Background />
+            </ReactFlow>
+            <div id='menu'>
+                <h2>
+                    Details
+                </h2>
+            </div>
+        </div>
     );
 }
 
