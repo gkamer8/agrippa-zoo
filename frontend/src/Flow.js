@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import ReactFlow, {
     Controls,
     Background,
     useNodesState,
     useEdgesState,
-    addEdge,
+    addEdge
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './Flow.css';
@@ -358,6 +358,8 @@ function Flow(props) {
         console.log(node.el);
     }
 
+    const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
     return (
         <div style={{ width:'100%', height: '100%', display: 'flex'}}>
 
@@ -367,6 +369,7 @@ function Flow(props) {
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onNodeClick={onNodeClick}
+                onConnect={onConnect}
             >
                 <Controls />
                 <Background />

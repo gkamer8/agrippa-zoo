@@ -37,6 +37,8 @@ function App() {
     function setLogin(){
         let auth_token = localStorage['auth_token'];
         if (auth_token){
+            let username = localStorage['username'];
+            setUsername(username);
             setIsLoggedIn(true);
         }
         else {
