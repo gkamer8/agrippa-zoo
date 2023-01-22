@@ -21,3 +21,7 @@
     background-color: var(--impressed);
     padding: .5em;
 }
+
+.model-link {
+    text-decoration: underline;
+}

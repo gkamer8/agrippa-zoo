@@ -6,10 +6,22 @@
     padding: 1em;
 }
 
+.import-node {
+    background-color: var(--impressed);
+    color: var(--accent);
+    border-width: 0px;
+}
+
+.export-node {
+    background-color: var(--impressed);
+    color: var(--accent);
+}
+
 .attr-row {
     background-color: var(--impressed);
     margin-bottom: 1em;
     padding: .25em;
+    border-width: 0px;
 }
 
 .attr-name {

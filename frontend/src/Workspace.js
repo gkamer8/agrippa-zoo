@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { BACKEND_URL } from './Api';
 import Flow from './Flow';
 import "./Workspace.css"
@@ -35,7 +35,7 @@ function Workspace(props){
         if (modelLoaded){
             setModelInfoBox(
                 <div id="model-info">
-                    {modelInfo.name}
+                    <Link to={"/model/"+id}><span className='model-link'>{modelInfo.name}</span></Link>
                 </div>
             ) 
         }

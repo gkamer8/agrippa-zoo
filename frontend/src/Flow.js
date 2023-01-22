@@ -298,11 +298,11 @@ function Flow(props) {
             
             if (el.nodeName === 'import'){
                 let name = attrs['from'].value;
-                return { id: id, position: { x: 0, y: 0 }, data: { label: name }, type: 'input', el: el }
+                return { id: id, className: "import-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'input', el: el }
             }
             else if (el.nodeName === 'export'){
                 let name = attrs['from'].value;
-                return { id: id, position: { x: 0, y: 0 }, data: { label: name }, type: 'output', el: el }
+                return { id: id, className: "export-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'output', el: el }
             }
 
             let title = `Untitled ${el.nodeName}`;
