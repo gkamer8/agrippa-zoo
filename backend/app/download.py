@@ -57,7 +57,7 @@ def get_xml_from_s3(path, download):
 
 # Takes path to the model folder, finds the readme, and returns it
 # NOTE: this should probably be designed differently
-# returns the proper response (i.e., an endpoint function calling this should end with return get_xml_from_s3(...))
+# returns the proper response (i.e., an endpoint function calling this should end with return get_readme_from_s3(...))
 def get_readme_from_s3(path):
     keys = get_folder_manifest_from_s3(path)
     # Find .agr or 
