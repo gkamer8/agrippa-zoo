@@ -39,7 +39,7 @@ function Model(){
             let url = BACKEND_URL + "download/readme?id=" + id;
             try {
                 const response = await fetch(url);
-                const myStr = await response.text(); //extract JSON from the http response
+                const myStr = await response.text();
             
                 setModelReadmeLoaded(true);
                 setModelReadme(myStr);

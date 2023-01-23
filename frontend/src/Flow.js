@@ -4,10 +4,13 @@ import ReactFlow, {
     Background,
     useNodesState,
     useEdgesState,
-    addEdge
+    addEdge,
+    useReactFlow,
+    Panel
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './Flow.css';
+import { BACKEND_URL } from './Api';
 import dagre from 'dagre';
 
 const initialNodes = [];
@@ -15,283 +18,44 @@ const initialNodes = [];
 const initialEdges = [];
 // const initialEdges = [];
 
-const exampleFileText = `
-<model script-version="0.0.1">
-
-    <!-- Uses default type, which is float32 -->
-    <!-- For tokens: each row is a one hot vector, sequence proceeds vertically in the matrix -->
-
-    <import from="tokens" dim="[var(ntokens), var(nvocab)]" />
-    <import from="mask" dim="[var(ntokens), var(ntokens)]" />
-    <import from="posembedmatrix" dim="[var(ntokens), var(dmodel)]" />
-    <import from="Embed" dim="[var(nvocab), var(dmodel)]" />
-    <import from="encoder_output" dim="[var(ntokens), var(dmodel)]" />
-
-    <!-- Shrinks tokens into dmodel using a learned embedding -->
-    <block title="Embedding">
-        <import from="Embed" />
-        <node op="Mul" title="EmbedMul">
-            <input src="Embed" />
-            <params dim="[1]" name="embeddings_scale" init="constant" init_args="[var(embed_scale)]" frozen="yes" />
-            <output name="embed_scaled" />
-        </node>
-        <node op="MatMul" title="EmbedProjection">
-            <input src="tokens" />
-            <input src="embed_scaled" />
-            <output name="embeddings" />
-        </node>
-        <export from="embeddings" dim="[var(ntokens), var(dmodel)]" />
-    </block>
-
-    <block title="PositionalEmbedding">
-        <import from="embeddings" />
-        <import from="posembedmatrix" />
-        <node op="Add">
-            <input src="embeddings" />
-            <input src="posembedmatrix" />
-            <output name="posembeddings" />
-        </node>
-        <export from="posembeddings" dim="[var(ntokens), var(dmodel)]" />
-    </block>
-
-    <!-- The big decoder block -->
-    <block title="DecoderLayer" rep="var(nlayers)">
-        <import from="posembeddings" dim="[var(ntokens), var(dmodel)]" />
-
-        <block title="Attention" stretch="var(nheads)">
-            <import from="posembeddings" dim="[var(ntokens), var(dmodel)]" />
-            <import from="mask" dim="[var(ntokens), var(ntokens)]" />
-            <block title="LinearQKV">
-                <import from="posembeddings" />
-                <node op="MatMul">
-                    <input src="posembeddings" />
-                    <params name="QueryWeights" dim="[var(dmodel), var(dqueries)]" />
-                    <output name="queries" dims="[var(ntokens), var(dqueries)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="posembeddings" />
-                    <params name="KeyWeights" dim="[var(dmodel), var(dkeys)]" />
-                    <output name="keys" dims="[var(ntokens), var(dkeys)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="posembeddings" />
-                    <params name="ValueWeights" dim="[var(dmodel), var(dvalues)]" />
-                    <output name="values" dim="[var(ntokens), var(dvalues)]" />
-                </node>
-                <export from="queries" />
-                <export from="keys" />
-                <export from="values" />
-            </block>
-            <block title="ScaledDotProductAttention">
-                <import from="mask" dim="[var(ntokens), var(ntokens)]" />
-                <import from="queries" />
-                <import from="values" />
-                <import from="keys" />
-                <node op="Transpose">
-                    <input src="keys" />
-                    <output name="keys_t" dim="[var(dkeys), var(ntokens)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="queries" />
-                    <input src="keys_t" />
-                    <output name="matmul" dim="[var(ntokens), var(ntokens)]" />
-                </node>
-                <node op="Div">
-                    <input src="matmul" />
-                    <params name="scale" frozen="yes" dim="[1]" init="constant" init_args="[var(scale)]" />
-                    <output name="scaled" />
-                </node>
-                <node title="Mask" op="Add">
-                    <input src="scaled" />
-                    <input src="mask" />
-                    <output name="masked" />
-                </node>
-                <node op="Softmax" axis="-1">
-                    <input src="masked" />
-                    <output name="softmaxed" />
-                </node>
-                <node op="MatMul" title="ValueMatmul">
-                    <input src="softmaxed" />
-                    <input src="values" />
-                    <output name="attended" dim="[var(ntokens), var(dvalues)]" />
-                </node>
-            </block>            
-            <export from="attended" />
-        </block>
-
-        <block title="ConcatLinear">
-            <import from="attended" />
-            <node op="MatMul">
-                <input src="attended" />
-                <params name="LinearConcatW" dim="[expr(dvalues * nheads), var(dmodel)]" />
-                <output name="linear_concatenated" />
-            </node>
-            <export from="linear_concatenated" />
-        </block>
-        
-        <block title="Add">
-            <import from="linear_concatenated" />
-            <import from="posembeddings" />
-            <node op="Add">
-                <input src="linear_concatenated" />
-                <input src="posembeddings" />
-                <output name="attended_added" />
-            </node>
-            <export from="attended_added" />
-        </block>
-
-        <node name="LN1_Placeholder" op="Identity">
-            <input src="attended_added" />
-            <output name="ln1$input" />
-        </node>
-        <block src="layer_norm.agr" name="ln1" />
-
-        <block title="FFN">
-            <import from="ln1$layer_norm_out" />
-            <node op="MatMul">
-                <input src="ln1$layer_norm_out" />
-                <params name="ffn_w" dim="[var(dmodel), var(dffnhidden)]" />
-                <output name="ffn_projected" dim="[var(ntokens), var(dffnhidden)]" />
-            </node>
-            <node op="Add" title="FFNBiases" >
-                <input src="ffn_projected" />
-                <!-- Note that the biases are numpy style broadcasted,
-                        so the FFN remains identical for each position -->
-                <params name="ffn_b" dim="[var(dffnhidden)]" init="zeros" />
-                <output name="ffn_biased" />
-            </node>
-            <node op="Relu">
-                <input src="ffn_biased" />
-                <output name="ffn_relu" />
-            </node>
-            <node op="MatMul">
-                <input src="ffn_relu" />
-                <params name="ffn_w2" dim="[var(dffnhidden), var(dmodel)]" />
-                <output name="ffn_second_proj" />
-            </node>
-            <node op="Add" title="FFNBiases2">
-                <input src="ffn_second_proj" />
-                <params name="ffn_b2" dim="[var(dmodel)]" init="zeros" />
-                <output name="ffn_out" />
-            </node>
-            <export from="ffn_out" />
-        </block>
-
-        <block title="Add2">
-            <import from="ffn_out" />
-            <import from="ln1$layer_norm_out" />
-            <node op="Add">
-                <input src="ffn_out" />
-                <input src="ln1$layer_norm_out" />
-                <output name="attended_added2" />
-            </node>
-            <export from="attended_added2" />
-        </block>
-
-        <node name="LN2_Placeholder" op="Identity">
-            <input src="attended_added" />
-            <output name="ln2$input" />
-        </node>
-        <block src="layer_norm.agr" name="ln2" />
-
-        <!-- Queries come from prev layer, keys and values come from encoder -->
-        <block title="CrossAttention" stretch="var(nheads)">
-            <import from="ln2$layer_norm_out" dim="[var(ntokens), var(dmodel)]" />
-            <import from="encoder_output" dim="[var(ntokens), var(dmodel)]" />
-            <block title="LinearQKV">
-                <import from="ln2$layer_norm_out" />
-                <node op="MatMul">
-                    <input src="ln2$layer_norm_out" />
-                    <params name="QueryWeights2" dim="[var(dmodel), var(dqueries)]" />
-                    <output name="queries2" dims="[var(ntokens), var(dqueries)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="encoder_output" />
-                    <params name="KeyWeights2" dim="[var(dmodel), var(dkeys)]" />
-                    <output name="keys2" dims="[var(ntokens), var(dkeys)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="encoder_output" />
-                    <params name="ValueWeights2" dim="[var(dmodel), var(dvalues)]" />
-                    <output name="values2" dim="[var(ntokens), var(dvalues)]" />
-                </node>
-                <export from="queries2" />
-                <export from="keys2" />
-                <export from="values2" />
-            </block>
-            <block title="ScaledDotProductAttention">
-                <import from="queries2" />
-                <import from="values2" />
-                <import from="keys2" />
-                <node op="Transpose">
-                    <input src="keys2" />
-                    <output name="keys_t2" dim="[var(dkeys), var(ntokens)]" />
-                </node>
-                <node op="MatMul">
-                    <input src="queries2" />
-                    <input src="keys_t2" />
-                    <output name="matmul2" dim="[var(ntokens), var(ntokens)]" />
-                </node>
-                <node op="Div">
-                    <input src="matmul2" />
-                    <params name="scale2" frozen="yes" dim="[1]" init="constant" init_args="[var(scale)]" />
-                    <output name="scaled2" />
-                </node>
-                <node op="Softmax" axis="-1">
-                    <input src="scaled2" />
-                    <output name="softmaxed2" />
-                </node>
-                <node op="MatMul" title="ValueMatmul">
-                    <input src="softmaxed2" />
-                    <input src="values2" />
-                    <output name="attended2" dim="[var(ntokens), var(dvalues)]" />
-                </node>
-            </block>            
-            <export from="attended2" />
-        </block>
-
-        <block title="ConcatLinear">
-            <import from="attended2" />
-            <node op="MatMul">
-                <input src="attended2" />
-                <params name="LinearConcatW2" dim="[expr(dvalues * nheads), var(dmodel)]" />
-                <output name="linear_concatenated2" />
-            </node>
-            <export from="linear_concatenated2" />
-        </block>
-
-        <block title="Add2">
-            <import from="linear_concatenated2" />
-            <import from="ln2$layer_norm_out" />
-            <node op="Add">
-                <input src="linear_concatenated2" />
-                <input src="ln2$layer_norm_out" />
-                <output name="attended2_added" />
-            </node>
-            <export from="attended2_added" />
-        </block>
-
-        <node name="LN3_Placeholder" op="Identity">
-            <input src="attended2_added" />
-            <output name="ln3$input" />
-        </node>
-        <block src="layer_norm.agr" name="ln3" />
-
-        <export from="ln3$layer_norm_out" />
-    </block>
-
-    <export from="ln3$layer_norm_out" dim="[var(ntokens), var(nvocab)]" />
-</model>
-`
+const exampleFileText = ``
 
 function Flow(props) {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const [fileText] = useState(exampleFileText);
+    const [modelLoadState, setModelLoadState] = useState(0);  // 0: not loaded, 1: loading, 2: loaded, 3: load failed 
+    const [fileText, setFileText] = useState(exampleFileText);
     const [details, setDetails] = useState(undefined);
+    const [modelDoc, setModelDoc] = useState(undefined);
+    const [focusedNodeControl, setFocusedNodeControl] = useState("");
 
     const id = props.id;
-    console.log(id);
+
+    const { fitView } = useReactFlow();
+
+    useEffect(() => {
+
+        async function getModel() {
+            setModelLoadState(1);  // loading
+            console.log("Getting model")
+            let url = BACKEND_URL + "download/markup?id=" + id;  // this should get the index file
+            try {
+                const response = await fetch(url);
+                const xmlText = await response.text(); //extract JSON from the http response
+                setFileText(xmlText);
+                setModelLoadState(2);  // loaded
+            } 
+            catch (error) {
+                console.error(error);
+                setModelLoadState(3);
+            }
+        }
+
+        if (modelLoadState === 0){
+            getModel();
+        }
+
+    }, [modelLoadState, id]);
 
     useEffect(() => {
 
@@ -382,7 +146,14 @@ function Flow(props) {
                 }
                 else if (rootChildren[i].nodeName === 'export'){
                     let name = rootChildren[i].attributes['from'].value;
-                    inputToNode[name] = [k+""];
+                    if (inputToNode[name]){
+                        if (!inputToNode[name].includes(k+"")){
+                            inputToNode[name].push(k+"");
+                        }
+                    }
+                    else {
+                        inputToNode[name] = [k+""];
+                    }
                     newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
                     k++;
                 }
@@ -435,18 +206,28 @@ function Flow(props) {
             return arrangedNodes;
         }
 
-        let parser = new DOMParser();
-        let xmlDoc = parser.parseFromString(fileText, "text/xml");
 
-        let modelDoc = xmlDoc.documentElement;
+        if (modelDoc === undefined){
+            return;
+        }
 
         let newNodesAndEdges = getNodesAndEdgesFromXMLObj(modelDoc);
         let newNodes = newNodesAndEdges[0];
         let newEdges = newNodesAndEdges[1];
         newNodes = arrangeNodes(newNodes, newEdges);
         setNodes(newNodes);
-        setEdges(newEdges)
-    }, [fileText, setNodes, setEdges])
+        setEdges(newEdges);
+
+        // fitView();  // seems to work only sometimes? to investigate.
+    }, [fileText, setNodes, setEdges, modelDoc, fitView]);
+
+
+    useEffect(() => {
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(fileText, "text/xml");
+
+        setModelDoc(xmlDoc.documentElement);
+    }, [fileText]);
 
     function onNodeClick(event, node){
         function makeAttrRow(attr){
@@ -473,11 +254,44 @@ function Flow(props) {
         setDetails(newDetails);
     }
 
+    function onNodeDoubleClick(event, node){
+        let el = node.el;
+        if (el.nodeName === 'block'){
+            setModelDoc(node.el);
+        }
+
+        function goToParent(el){
+            // Super hacky
+            // We currently want to return to the view of the parent node of el
+            // When we do that, we want the goToParent to send us to the parent of the parent
+            // Suppose that that is the root - then *its* parent is actually a "#document"
+            // But then the #document's parent is null. so this is the solution.
+            if (el.parentNode.parentNode.parentNode == null){
+                setFocusedNodeControl("");
+            }
+            else {
+                let newFocusedNodeControl = (
+                    <div onClick={() => goToParent(el.parentNode)} className='focused-node-control'>
+                        {"<< Back"}
+                    </div>
+                )
+                setFocusedNodeControl(newFocusedNodeControl);
+            }
+            setModelDoc(el.parentNode);
+        }
+
+        let newFocusedNodeControl = (
+            <div onClick={() => goToParent(el)} className='focused-node-control'>
+                {"<< Back"}
+            </div>
+        )
+        setFocusedNodeControl(newFocusedNodeControl);
+    }
+
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
     return (
         <div style={{ width:'100%', height: '100%', display: 'flex'}}>
-
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -485,9 +299,14 @@ function Flow(props) {
                 onEdgesChange={onEdgesChange}
                 onNodeClick={onNodeClick}
                 onConnect={onConnect}
+                onNodeDoubleClick={onNodeDoubleClick}
+                fitView  // necessary for flow to call fitView
             >
                 <Controls />
                 <Background />
+                <Panel position='top-right'>
+                    {focusedNodeControl}
+                </Panel>
             </ReactFlow>
             <div id='menu'>
                 <h2>

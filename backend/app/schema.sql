@@ -63,10 +63,22 @@ VALUES ("Gordon Kamer",
         "Transformer Decoder",
         "transformer-decoder",
         "A decoder-only transformer that accepts as input every constant used in the model.",
-        1,
+        0,
         '{"input": ["text", "tokens"], "output": ["distribution"]}',
         'gkamer',
         'decoder.agr'
+        );
+
+
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
+VALUES ("Gordon Kamer",
+        "Transformer",
+        "transformer",
+        "The original transformer as seen in Vaswani et al.",
+        1,
+        '{"input": ["text", "tokens"], "output": ["distribution"]}',
+        'gkamer',
+        'transformer.agr'
         );
 
 /* And now for users */

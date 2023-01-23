@@ -1,9 +1,9 @@
 @import "./style.css";
 
 #menu{
-    width: 20%;
     text-align: left;
     padding: 1em;
+    width: 20%;
 }
 
 .import-node {
@@ -30,4 +30,12 @@
 
 .attr-value {
     font-family:'Courier New', Courier, monospace;
+}
+
+.focused-node-control {
+    background-color: var(--impressed);
+    color: var(--text);
+    padding: 1em;
+    text-decoration: underline;
+    cursor: pointer;
 }

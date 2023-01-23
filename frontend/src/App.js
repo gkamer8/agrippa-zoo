@@ -10,17 +10,28 @@ import Home from './Home';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+
+function getLoggedIn(){
+    let auth_token = localStorage['auth_token'];
+    if (auth_token){
+        return true;
+    }
+    return false;
+}
+
+
+function RequireAuth ({children}) {
+    if (!getLoggedIn()) {
+       return <Navigate to="/login" replace />;
+    }
+    return children;
+}
+
+
 function App() {
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState(null);
-
-    function RequireAuth ({children}) {
-        if (!isLoggedIn) {
-           return <Navigate to="/login" replace />;
-        }
-        return children;
-    }
 
     function handleLogout() {
         localStorage.clear();
@@ -35,8 +46,8 @@ function App() {
     }
 
     function setLogin(){
-        let auth_token = localStorage['auth_token'];
-        if (auth_token){
+        let trueLogin = getLoggedIn();
+        if (trueLogin){
             let username = localStorage['username'];
             setUsername(username);
             setIsLoggedIn(true);

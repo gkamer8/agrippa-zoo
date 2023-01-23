@@ -10,6 +10,7 @@ function Upload(props) {
     const [inputTags, setInputTags] = useState([]);
     const [outputTags, setOutputTags] = useState([]);
     const [canonChecked, setCanonChecked] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     function handleFileChange(e){
         let fileList = e.target.files;
@@ -53,14 +54,13 @@ function Upload(props) {
 
     async function sendToAPI() {
 
-        setSentStatus(1);
-
         let fileData = new FormData();
 
         let model_name = document.getElementById('model-name').value;
         let author_name = document.getElementById('author-name').value;
         let short_desc = document.getElementById('short-desc').value;
         let canonical = canonChecked;
+        let file_index = document.getElementById('file-index').value;
         let tagData = getTagFormData();
 
         if (!model_name){
@@ -87,16 +87,21 @@ function Upload(props) {
             notifyMissing("file(s)");
             return;
         }
+        else if (!file_index){
+            notifyMissing("index file");
+            return;
+        }
 
         fileData.append('model_name', model_name);
         fileData.append('author_name', author_name);
         fileData.append('short_desc', short_desc);
         fileData.append('tags', tagData);
         fileData.append('canonical', canonical);
+        fileData.append('file_index', file_index);
         for (let i = 0; i < fileArray.length; i++){
             fileData.append('file' + i, fileArray[i]);
         }
-
+        setSentStatus(1);
         let url = BACKEND_URL + "user/upload"
         try {
             const response = await fetch(url, {
@@ -111,6 +116,7 @@ function Upload(props) {
             console.log(myJson);
 
             if (myJson.response === 'failed'){
+                setErrorMessage("" + myJson.why);
                 setSentStatus(3);
             }
             else {
@@ -119,6 +125,7 @@ function Upload(props) {
         } 
         catch (error) {
             console.error(error);
+            setErrorMessage("error connecting to server")
             setSentStatus(3);
         }
     }
@@ -226,7 +233,7 @@ function Upload(props) {
         )
     }
     else if (sentStatus === 3){
-        statusText = "An error occurred; please try again.";
+        statusText = "An error occurred; please try again. Error message: " + errorMessage;
     }
 
     return (
@@ -263,6 +270,9 @@ function Upload(props) {
                     <div className='form-row'>
                         <FileUpload id="file-selector" onChange={handleFileChange} />
                     </div>
+                </div>
+                <div className='form-row'>
+                    <TextInput id="file-index" placeholder="Index File (main filename)" />
                 </div>
                 <div className='form-row'>
                     <Button value="Submit" onClick={onSubmit} />

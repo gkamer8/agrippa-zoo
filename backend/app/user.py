@@ -30,6 +30,7 @@ def upload(current_user):
     short_desc = request.form.get('short_desc')
     tags = request.form.get('tags')
     canonical = request.form.get('canonical')
+    file_index = request.form.get('file_index')
     
     if not model_name:
         return json.dumps({'response': 'failed', 'why': 'missing_model_name'})
@@ -41,6 +42,8 @@ def upload(current_user):
         return json.dumps({'response': 'failed', 'why': 'missing_tags'})
     elif not canonical:
         return json.dumps({'response': 'failed', 'why': 'missing_canonical'})
+    elif not file_index:
+        return json.dumps({'response': 'failed', 'why': 'missing_file_index'})
 
     try:
         canonical = canonical == 'true'
@@ -85,8 +88,9 @@ def upload(current_user):
         result = object.put(Body=file_bytes)
 
     sql = """
-    INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username)
+    INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
     VALUES (?,
+            ?,
             ?,
             ?,
             ?,
@@ -97,7 +101,7 @@ def upload(current_user):
     """
 
     # Now add to database
-    db.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user))
+    db.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user, file_index))
     db.commit()
 
     return json.dumps({'response': 'succeeded'})

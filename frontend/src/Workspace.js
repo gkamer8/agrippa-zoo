@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { BACKEND_URL } from './Api';
 import Flow from './Flow';
+import { ReactFlowProvider } from 'reactflow';
 import "./Workspace.css"
 
 
@@ -60,7 +61,7 @@ function Workspace(props){
             {modelInfoBox}
             <div id="editor-and-options">
                 <div id="flow-container">
-                    <Flow id={id} />
+                <ReactFlowProvider><Flow id={id} /></ReactFlowProvider>
                 </div>
             </div>
         </div>
