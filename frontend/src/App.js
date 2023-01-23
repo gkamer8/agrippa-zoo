@@ -73,7 +73,7 @@ function App() {
                         <ModelBoard />
                     } />
                     <Route path="/model/:id" element={
-                        <Model />
+                        <Model isLoggedIn={isLoggedIn} username={username} />
                     } />
                     <Route path="/upload" element={
                         <RequireAuth>

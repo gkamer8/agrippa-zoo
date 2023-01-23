@@ -5,23 +5,8 @@ from flask_cors import cross_origin
 
 bp = Blueprint('info', __name__, url_prefix='/info')
 
-DB_DICT = {
-    0: 'id',
-    1: 'author_name',
-    2: 'name',
-    3: 'short_desc',
-    4: 'canonical',
-    5: 'tags'
-}
-
 def make_dict(row):
-    x = {}
-    for i in range(len(row)):
-        try:
-            x[DB_DICT[i]] = row[i]
-        except KeyError:
-            continue
-    return x
+    return dict(row)
 
 DEFAULT_LIMIT = 100
 DEFAULT_OFFSET = 0
@@ -88,7 +73,7 @@ def model():
     
     db = get_db()
     model_info = db.execute(
-        "SELECT id, author_name, name, short_desc, canonical, tags FROM models WHERE id=?", (model_id,)
+        "SELECT id, author_name, name, short_desc, canonical, tags, username, file_index FROM models WHERE id=?", (model_id,)
     ).fetchone()
 
     structured = make_dict(model_info)

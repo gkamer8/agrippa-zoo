@@ -40,8 +40,27 @@ function SearchableTable(props) {
 
     // TODO: allow for arbitrary rows determined from parent
     function makeSquare(item) {
-        let url = "/model/" + item.id
+        let url = "/model/" + item.id;
         let canon = item.canonical ? (<div className='canon'>✓</div>) : ("");
+
+        /*
+        // I didn't really like how the tags functioned
+        // For one, they make the table too big on mobile.
+        function makeTag(tag){
+            return (
+                <div className="model-table-tag" key={tag}>
+                    {tag}
+                </div>
+            )
+        }
+
+        let tags = JSON.parse(item.tags);
+        let inputs = tags["input"] ? tags["input"] : [];
+        let outputs = tags["output"] ? tags["output"] : [];
+
+        let inputTags = inputs.map(makeTag);
+        let outputTags = outputs.map(makeTag);
+        */
         // Note that the link is used instead of some onclick because props/state is hard
         return (
             <tr key={item.id}>
@@ -52,9 +71,6 @@ function SearchableTable(props) {
                         </Link>
                     </div>
                     {canon}
-                </td>
-                <td>
-                    {item.author_name}
                 </td>
                 <td>
                     {item.short_desc}
@@ -83,9 +99,6 @@ function SearchableTable(props) {
                     <tr>
                         <th>
                             Name
-                        </th>
-                        <th>
-                            Author
                         </th>
                         <th>
                             Description

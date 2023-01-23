@@ -5,8 +5,8 @@ import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 
-
-function Model(){
+// Takes props username and isLoggedIn
+function Model(props){
 
     const [modelInfo, setModelInfo] = useState({});
     const [modelLoadFailed, setModelLoadFailed] = useState(false);
@@ -15,6 +15,8 @@ function Model(){
     const [modelReadme, setModelReadme] = useState("");
     const [modelReadmeLoadFailed, setModelReadmeLoadFailed] = useState(false);
     const [modelReadmeLoaded, setModelReadmeLoaded] = useState(false);
+
+    const [modelDeleteStatus, setModelDeleteStatus] = useState(0);
 
     let { id } = useParams();
 
@@ -112,6 +114,68 @@ function Model(){
                 </div>
             );
         }
+
+        let ownerOptions = "";
+        if(props.isLoggedIn){
+            if (modelInfo.username === props.username){
+
+                async function onDelete(){
+                    
+                    if (!window.confirm("Are you sure you want to delete this model?")) {
+                        return
+                    }
+
+                    setModelDeleteStatus(1);
+                    let fileData = new FormData();
+                    fileData.append('id', id);
+                    let url = BACKEND_URL + "update/delete"
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'x-access-token': localStorage.getItem("auth_token"),
+                            },
+                            body: fileData
+                         });
+                        const myJson = await response.json(); //extract JSON from the http response
+            
+                        console.log(myJson);
+            
+                        if (myJson.response === 'failed'){
+                            setModelDeleteStatus(3);
+                        }
+                        else {
+                            setModelDeleteStatus(2);
+                        }
+                    } 
+                    catch (error) {
+                        console.error(error);
+                        setModelDeleteStatus(3);
+                    }                    
+                }
+
+                let deleteOptions = "";
+                if (modelDeleteStatus === 0){
+                    deleteOptions = <span className='delete-option' onClick={onDelete}>Delete</span>
+                }
+                else if (modelDeleteStatus === 1){
+                    deleteOptions = <span className='delete-option'>Deleting model...</span>
+                }
+                else if (modelDeleteStatus === 2){
+                    deleteOptions = <span className='delete-option'>Model deleted.</span>
+                }
+                else {
+                    deleteOptions = <span className='delete-option'>Failed to delete model.</span>
+                }
+
+                ownerOptions = (
+                    <div className='owner-options'>
+                        You own this model. <br/><br/>
+                        {deleteOptions}
+                    </div>
+                );
+            }
+        }
         
         const listTagGroups = tag_arr.map(makeTagGroup);
         return (
@@ -121,7 +185,8 @@ function Model(){
                         {model_name}
                     </h1>
                     {canon}
-
+                    {ownerOptions}
+                    <br/>
                     <div>
                         <span className='author'>Author: </span>{model_author}
                     </div>

@@ -35,7 +35,7 @@ function Home(props){
             getModels();
         }
 
-    }, [modelsLoaded, props.isLoggedIn]);
+    }, [modelsLoaded, props.isLoggedIn, props.username]);
 
     let message = (
         <div>
@@ -47,15 +47,28 @@ function Home(props){
     if (props.isLoggedIn){
         let modelTable = "";
         if (modelsLoaded){
-            modelTable = (
-                <div>
-                    <br />
-                    <h2>
-                        Your Models
-                    </h2>
-                    <ModelTable content={origModels} />
-                </div>
-            )
+            if (modelsLoadFailed){
+                modelTable = (
+                    <div>
+                        <br />
+                        <h2>
+                            Your Models
+                        </h2>
+                        Models could not be loaded.
+                    </div>
+                )  
+            }
+            else {
+                modelTable = (
+                    <div>
+                        <br />
+                        <h2>
+                            Your Models
+                        </h2>
+                        <ModelTable content={origModels} />
+                    </div>
+                )   
+            }
         }
         message = (
             <div>

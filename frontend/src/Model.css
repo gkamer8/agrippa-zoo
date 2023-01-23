@@ -66,3 +66,13 @@ body {
     margin-right: .5em;
     padding: .2em;
 }
+
+.owner-options {
+    background-color: var(--impressed);
+    padding: 1em;
+}
+
+.delete-option {
+    text-decoration: underline;
+    cursor: pointer;
+}
