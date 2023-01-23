@@ -57,9 +57,6 @@ def token_required(f):
 @bp.route('/login', methods=['POST'])
 @cross_origin()
 def login():
-
-    print("herasdfe")
-
     username = request.form['username']
     password = request.form['password']
 
@@ -102,7 +99,6 @@ def register():
             )
             db.commit()
         except db.IntegrityError:
-            print("really?")
             error = json.dumps({'response': 'failed', 'why': 'username_taken'})
         else:
             return json.dumps({'response': 'succeeded'})

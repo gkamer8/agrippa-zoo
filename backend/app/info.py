@@ -33,6 +33,7 @@ def manifest():
     # Accepts a limit and an offset
     limit = request.args.get('limit')
     offset = request.args.get('offset')
+    username = request.args.get('username')
 
     try:
         limit = int(limit)
@@ -46,17 +47,32 @@ def manifest():
 
     # Translate column numnber into key
     db = get_db()
-    manifest = db.execute("""
-        SELECT *
-        FROM
-        (
-            SELECT id, author_name, name, short_desc, canonical, tags, ROW_NUMBER() OVER (ORDER BY name) AS rn
-            FROM models
-            ORDER BY name
-        )
-        WHERE rn > ?
-        LIMIT ?
-        """, (offset, limit)).fetchall()
+    manifest = None
+    if username is None:
+        manifest = db.execute("""
+            SELECT *
+            FROM
+            (
+                SELECT id, author_name, name, short_desc, canonical, tags, ROW_NUMBER() OVER (ORDER BY name) AS rn
+                FROM models
+                ORDER BY name
+            )
+            WHERE rn > ?
+            LIMIT ?
+            """, (offset, limit)).fetchall()
+    else:
+        manifest = db.execute("""
+            SELECT *
+            FROM
+            (
+                SELECT id, author_name, name, short_desc, canonical, tags, ROW_NUMBER() OVER (ORDER BY name) AS rn
+                FROM models
+                WHERE username=?
+                ORDER BY name
+            )
+            WHERE rn > ?
+            LIMIT ?
+            """, (username, offset, limit)).fetchall()
 
     results = [make_dict(row) for row in manifest]
     data = json.dumps(results)

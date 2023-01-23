@@ -43,7 +43,7 @@ VALUES ("Ryan Linnihan",
         "A simple FFN with Relu activations",
         1,
         '{"input": ["vector"], "output": ["vector"]}',
-        'gkamer',
+        'rylinni',
         'ffn.agr'
         );
 
@@ -54,7 +54,7 @@ VALUES ("Jared Simpson",
         "A layer normalization, as seen in Ba, Kiros, Hinton 2016",
         1,
         '{"input": ["matrix", "activations"], "output": ["matrix", "activations"]}',
-        'gkamer',
+        'jsimp',
         'layernorm.agr'
         );
 
@@ -86,3 +86,9 @@ VALUES ("Gordon Kamer",
 /* Password correponds to 'bruh' */
 INSERT INTO users (username, password_hash)
 VALUES ("gkamer", "pbkdf2:sha256:260000$YWuw9E1P7aoLxJ8m$180b0de6ceb54a5b1e8ddf0a6a510cebfa2a5ffbbaaf518abfd435ed21f53da9");
+
+INSERT INTO users (username, password_hash)
+VALUES ("rylinni", "pbkdf2:sha256:260000$YWuw9E1P7aoLxJ8m$180b0de6ceb54a5b1e8ddf0a6a510cebfa2a5ffbbaaf518abfd435ed21f53da9");
+
+INSERT INTO users (username, password_hash)
+VALUES ("jsimp", "pbkdf2:sha256:260000$YWuw9E1P7aoLxJ8m$180b0de6ceb54a5b1e8ddf0a6a510cebfa2a5ffbbaaf518abfd435ed21f53da9");

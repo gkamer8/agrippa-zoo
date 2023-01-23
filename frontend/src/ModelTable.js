@@ -5,11 +5,9 @@ import './ModelTable.css'
 
 
 // Needs to have a *props.contents* list that defines the contents of the table
-// ... as well as a *props.headers* list defining the table headers
 function SearchableTable(props) {
 
-    const origModels = props.contents;
-    const headers = props.headers;
+    const origModels = props.content;
     
     const [models, setModels] = useState([]);
     const [searchText, setSearchText] = useState('');
@@ -40,7 +38,7 @@ function SearchableTable(props) {
         }
     }, [searchText, origModels, canonChecked]);
 
-
+    // TODO: allow for arbitrary rows determined from parent
     function makeSquare(item) {
         let url = "/model/" + item.id
         let canon = item.canonical ? (<div className='canon'>✓</div>) : ("");
@@ -73,16 +71,7 @@ function SearchableTable(props) {
         setCanonChecked(!canonChecked);
     }
 
-    function makeHeader(header) {
-        return (
-            <th key={header}>
-                {header}
-            </th>
-        );
-    }
-
     const listItems = models.map(makeSquare);
-    const headersList = headers.map(makeHeader);
     return (
         <div>
             <TextInput className={'search-bar'} onChange={handleSearchTextChange} placeholder="Search..." />
@@ -90,7 +79,15 @@ function SearchableTable(props) {
             <table className='model-table'>
                 <thead>
                     <tr>
-                        {headersList}
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Author
+                        </th>
+                        <th>
+                            Description
+                        </th>
                     </tr>
                 </thead>
                 <tbody>{listItems}</tbody>

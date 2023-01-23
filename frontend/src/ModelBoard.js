@@ -45,11 +45,10 @@ function ModelBoard(props){
         )
     }
     else{
-        let headers = ['Name', 'Author', 'Description'];
         return (
             <div className='content-container'>
                 <div className='table-container'>
-                    <ModelTable contents={origModels} headers={headers} />
+                    <ModelTable content={origModels} />
                 </div>
             </div>
         )
