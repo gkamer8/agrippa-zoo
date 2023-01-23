@@ -74,7 +74,9 @@ function SearchableTable(props) {
     const listItems = models.map(makeSquare);
     return (
         <div>
-            <TextInput className={'search-bar'} onChange={handleSearchTextChange} placeholder="Search..." />
+            <div className={'search-bar'}>
+                <TextInput onChange={handleSearchTextChange} placeholder="Search..." />
+            </div>
             <Checkmark onClick={canonChange} label="Canonical" />
             <table className='model-table'>
                 <thead>
