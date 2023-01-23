@@ -38,7 +38,7 @@
     border-width: 0px;
 }
 
-.canon-button {
+.check-button {
     background-color: var(--impressed);
     color: var(--impressed);
     padding: .1em;
@@ -46,6 +46,14 @@
     padding-right: .2em;
     font-size: .75em;
     display: inline-block;
+    cursor: pointer;
+}
+
+.check-label {
+    vertical-align: middle;
+    cursor: pointer;
+    padding-left: .5em;
+    cursor: pointer;
 }
 
 .file-upload {

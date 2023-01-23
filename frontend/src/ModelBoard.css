@@ -17,18 +17,6 @@ a:active { text-decoration: none; }
     text-align: left;
 }
 
-td, th {
-    padding: 10px;
-    border-bottom: 1px solid var(--text);
-    padding-bottom: 10px;
-    padding-top: 10px;
-    font-size: 1em;
-}
-
-th {
-    color: var(--accent);
-}
-
 .content-container {
     text-align: left;
 }
@@ -38,41 +26,4 @@ th {
     text-align: left;
     margin-left: var(--def-margin);
     margin-right: var(--def-margin);
-}
-
-.search-bar {
-    width: 20em !important;
-}
-
-.canon {
-    background-color: var(--impressed);
-    color: var(--accent);
-    padding: .1em;
-    padding-left: .2em;
-    padding-right: .2em;
-    font-size: .75em;
-    display: inline-block;
-}
-
-.search-opts {
-    margin-top: 1em;
-    margin-bottom: 1em;
-}
-
-.canon-label {
-    vertical-align: middle;
-    cursor: pointer;
-}
-
-.canon-button {
-    vertical-align: middle;
-    display: inline-block;
-    background-color: var(--impressed);
-    margin-right: .5em;
-    font-size: .75em;
-    padding: .1em;
-    padding-left: .2em;
-    padding-right: .2em;
-    cursor: pointer;
-    color: var(--impressed);
 }

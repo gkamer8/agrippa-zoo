@@ -1,0 +1,26 @@
+td, th {
+    padding: 10px;
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 10px;
+    padding-top: 10px;
+    font-size: 1em;
+}
+
+th {
+    color: var(--accent);
+}
+
+.canon {
+    background-color: var(--impressed);
+    color: var(--accent);
+    padding: .1em;
+    padding-left: .2em;
+    padding-right: .2em;
+    font-size: .75em;
+    display: inline-block;
+}
+
+.search-bar {
+    margin-bottom: .5em;
+    width: 25em;
+}

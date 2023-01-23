@@ -37,21 +37,21 @@ export function Checkmark({className, label, ...props}){
 
     function canonClick(){
         if (checked){
-            document.getElementsByClassName('canon-button')[0].style.color = "#1f1f1f";
+            document.getElementsByClassName('check-button')[0].style.color = "#1f1f1f";
             setChecked(false);
         }
         else {
-            document.getElementsByClassName('canon-button')[0].style.color = "#55b13e";
+            document.getElementsByClassName('check-button')[0].style.color = "#55b13e";
             setChecked(true);
         }
         props.onClick();
     }
 
-    className = className ? `canonical-option ${className}` : 'canonical-option';
+    className = className ? `check-option ${className}` : 'check-option';
     return (
         <div className={className}>
-            <div className='canon-button' onClick={canonClick}>✓</div>
-            <span className='canon-label' onClick={canonClick}>{label}</span>
+            <div className='check-button' onClick={canonClick}>✓</div>
+            <span className='check-label' onClick={canonClick}>{label}</span>
         </div>
     )
 }
