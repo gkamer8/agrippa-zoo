@@ -18,6 +18,9 @@ function Model(props){
     const [modelReadmeLoaded, setModelReadmeLoaded] = useState(false);
 
     const [modelDeleteStatus, setModelDeleteStatus] = useState(0);
+    const [submitFilesStatus, setSubmitFilesStatus] = useState(0);
+    
+    const [fileArray, setFileArray] = useState([]);
 
     let { id } = useParams();
 
@@ -120,6 +123,7 @@ function Model(props){
         if(props.isLoggedIn){
             if (modelInfo.username === props.username){
 
+                // Delete files button
                 async function onDelete(){
                     
                     if (!window.confirm("Are you sure you want to delete this model?")) {
@@ -169,15 +173,67 @@ function Model(props){
                     deleteOptions = <span className='delete-option'>Failed to delete model.</span>
                 }
 
-                function submitFiles(){
-                    // TODO
-                    console.log("So you want to submit files...")
+                // Submit files button
+                function handleFileChange(e){
+                    let fileList = e.target.files;
+                    let n = fileList.length;
+                    let newFileArray = [];
+                    for (let i = 0; i < n; i++){
+                        newFileArray.push(fileList[i]);
+                    }
+                    setFileArray(newFileArray);
+                }
+
+                async function submitFiles(){
+
+                    setSubmitFilesStatus(1);
+                    let fileData = new FormData();
+                    for (let i = 0; i < fileArray.length; i++){
+                        fileData.append('file' + i, fileArray[i]);
+                    }
+                    fileData.append('id', id);
+                    let url = BACKEND_URL + "update/upload"
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'x-access-token': localStorage.getItem("auth_token"),
+                            },
+                            body: fileData
+                         });
+                        const myJson = await response.json(); //extract JSON from the http response
+            
+                        console.log(myJson);
+            
+                        if (myJson.response === 'failed'){
+                            setSubmitFilesStatus(3);
+                        }
+                        else {
+                            setSubmitFilesStatus(2);
+                        }
+                    } 
+                    catch (error) {
+                        console.error(error);
+                        setSubmitFilesStatus(3);
+                    }
+                }
+
+                let submitFilesResponse = "";
+                if (submitFilesStatus === 1){
+                    submitFilesResponse = <div><br/>Submitting files...</div>
+                }
+                else if (submitFilesStatus === 2){
+                    submitFilesResponse = <div><br/>Files successfully uploaded.</div>
+                }
+                else if (submitFilesStatus === 3){
+                    submitFilesResponse = <div><br/>Failed to upload files.</div>
                 }
 
                 let fileUpload = (
                     <div>
-                        <FileUpload buttonClassName='upload-button' />
+                        <FileUpload onChange={handleFileChange} buttonClassName='upload-button' />
                         <span onClick={submitFiles} className='delete-option'>Submit Files</span>
+                        {submitFilesResponse}
                     </div>
                 )
 

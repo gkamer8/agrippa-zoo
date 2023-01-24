@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from app.db import get_db
 import json
 from flask_cors import cross_origin
+from .update import upload_files_to_s3, BUCKET_NAME, get_s3_session
 from .auth import token_required
 import boto3
 from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
@@ -52,15 +53,9 @@ def upload(current_user):
 
     db = get_db()
 
-    bucket_name = 'agrippa-files'
-
-    session = boto3.Session(
-                aws_access_key_id=AWS_ACCESS_KEY,
-                aws_secret_access_key=AWS_SECRET_KEY
-            ) 
-    res = session.resource('s3')
+    session = get_s3_session()
     s3 = session.client('s3')
-    result = s3.list_objects_v2(Bucket=bucket_name)
+    result = s3.list_objects_v2(Bucket=BUCKET_NAME)
     # Get a list of all the directories in the bucket
     directories = [item['Key'] for item in result.get('Contents', []) if item['Size'] == 0]
     # Get a unique folder name
@@ -82,10 +77,8 @@ def upload(current_user):
         new_name = saved_new_name + str(i)
         i += 1
 
-    for file in request.files:
-        file_bytes = request.files[file].read()
-        object = res.Object('agrippa-files', f'{new_name}/{request.files[file].filename}')
-        result = object.put(Body=file_bytes)
+    
+    upload_files_to_s3(request.files, new_name, session)
 
     sql = """
     INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
