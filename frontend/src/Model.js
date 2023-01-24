@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import { FileUpload } from './Form.js';
+import { Button, FileUpload, TextInput } from './Form.js';
 
 // Takes props username and isLoggedIn
 function Model(props){
@@ -19,6 +19,7 @@ function Model(props){
 
     const [modelDeleteStatus, setModelDeleteStatus] = useState(0);
     const [submitFilesStatus, setSubmitFilesStatus] = useState(0);
+    const [submitModelNameStatus, setSubmitModelNameStatus] = useState(0);
     
     const [fileArray, setFileArray] = useState([]);
 
@@ -119,10 +120,25 @@ function Model(props){
             );
         }
 
+        let modelName = (
+                <div id='model-name-comp'>
+                    <div id='normal-model-name' style={{'display': 'block'}}>
+                        <div className='model_name' id='model_name'>
+                            {model_name}
+                        </div>
+                    </div>
+                </div>
+            )
+
+        let modelAuthorComponent = (
+            <div style={{'display': 'inline-block'}}>
+                <span style={{'display': 'inline'}} id='true-model-author'>{model_author}</span>
+                <TextInput style={{'display': 'none'}} id='model-author-text-box' />
+            </div>
+        )
         let ownerOptions = "";
         if(props.isLoggedIn){
             if (modelInfo.username === props.username){
-
                 // Delete files button
                 async function onDelete(){
                     
@@ -253,6 +269,28 @@ function Model(props){
                     else {
                         document.getElementById('edit-options').style.display = 'block';
                     }
+
+                    let nameDis = document.getElementById('normal-model-name').style.display;
+                    if (nameDis === 'block'){
+                        document.getElementById('normal-model-name').style.display = 'none';
+                        document.getElementById('editable-model-name').style.display = 'block';
+                    }
+                    else {
+                        document.getElementById('normal-model-name').style.display = 'block';
+                        document.getElementById('editable-model-name').style.display = 'none';
+                    }
+                    document.getElementById('model-name-text-box').value = model_name;
+
+                    let authorDis = document.getElementById('true-model-author').style.display;
+                    if (authorDis === 'inline'){
+                        document.getElementById('true-model-author').style.display = 'none';
+                        document.getElementById('model-author-text-box').style.display = 'inline';
+                    }
+                    else {
+                        document.getElementById('true-model-author').style.display = 'inline';
+                        document.getElementById('model-author-text-box').style.display = 'none';
+                    }
+                    document.getElementById('model-author-text-box').value = model_author;
                 }
 
                 ownerOptions = (
@@ -261,6 +299,65 @@ function Model(props){
                         {options}
                     </div>
                 );
+
+                async function submitModelName(){
+
+                    setSubmitModelNameStatus(1);
+                    let fileData = new FormData();
+                    fileData.append('id', id);
+                    fileData.append('model_name', document.getElementById('model-name-text-box').value)
+                    let url = BACKEND_URL + "update/edit"
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'x-access-token': localStorage.getItem("auth_token"),
+                            },
+                            body: fileData
+                         });
+                        const myJson = await response.json(); //extract JSON from the http response
+            
+                        console.log(myJson);
+            
+                        if (myJson.response === 'failed'){
+                            setSubmitModelNameStatus(3);
+                        }
+                        else {
+                            document.getElementById('model_name').innerHTML = document.getElementById('model-name-text-box').value;
+                            setSubmitModelNameStatus(2);
+                        }
+                    } 
+                    catch (error) {
+                        console.error(error);
+                        setSubmitModelNameStatus(3);
+                    }
+                }
+
+                let modelNameStatusComponent = ""
+                if (submitModelNameStatus === 1){
+                    modelNameStatusComponent = <div className='model-name-status-text'>Submitting new model name...</div>
+                }
+                else if (submitModelNameStatus === 2){
+                    modelNameStatusComponent = <div className='model-name-status-text'>Model name successfully changed.</div>
+                }
+                else if (submitModelNameStatus === 3){
+                    modelNameStatusComponent = <div className='model-name-status-text'>Failed to change model name.</div>
+                }
+
+                modelName = (
+                    <div id='model-name-comp'>
+                        <div id='normal-model-name' style={{'display': 'block'}}>
+                            <div className='model_name' id='model_name'>
+                                {model_name}
+                            </div>
+                        </div>
+                        <div id='editable-model-name' style={{'display': 'none'}}>
+                            <TextInput id='model-name-text-box' className='model_name editable-model-name' />
+                            <div onClick={submitModelName} style={{'margin-bottom': '1em', 'text-decoration': 'underline', 'cursor': 'pointer', 'display': 'inline-block'}}>Submit Name Change</div>
+                            {modelNameStatusComponent}
+                        </div>
+                    </div>
+                )
             }
         }
         
@@ -268,14 +365,12 @@ function Model(props){
         return (
             <div className='content-container'>
                 <div className='model_card'>
-                    <h1 className='model_name'>
-                        {model_name}
-                    </h1>
+                    {modelName}
                     {canon}
                     {ownerOptions}
                     <br/>
                     <div>
-                        <span className='author'>Author: </span>{model_author}
+                        <span className='author'>Author: </span>{modelAuthorComponent}
                     </div>
                     <div className='download-block'>
                         <a href={BACKEND_URL + "download/markup?download=1&id=" + id} download={true}>

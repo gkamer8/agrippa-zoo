@@ -7,6 +7,14 @@ body {
 .model_name {
     display: inline-block;
     margin-right: .5em;
+    font-size: 2em;
+    background-color: var(--bg);
+    font-weight: bold;
+    margin-bottom: .5em;
+}
+
+.editable-model-name {
+    background-color: var(--impressed);
 }
 
 .model_card {
@@ -79,4 +87,8 @@ body {
 
 .upload-button {
     background-color: var(--bg);
+}
+
+.model-name-status-text {
+    margin-bottom: 1em;
 }

@@ -80,8 +80,52 @@ def upload(username):
     ).fetchone()
 
     if username != model_info['username']:
-        return "I cleaned the windows in a smile so bland and I copied all the letters in a big round hand"
+        return "I cleaned the windows and I swept the floor and I polished off the handles of the big front door"
 
     upload_files_to_s3(request.files, model_info['s3_storage_path'], get_s3_session())
+
+    return json.dumps({'response': 'succeeded'})
+
+
+@bp.route('/edit', methods=['POST'])
+@cross_origin()
+@token_required
+def edit(username):
+    model_id = request.form.get('id')
+    if not model_id:
+        return "as office boy I made such a mark that they gave me the post of a junior clerk"
+    
+    db = get_db()
+    model_info = db.execute(
+        "SELECT id, username, name, author_name, tags, short_desc, canonical FROM models WHERE id=?", (model_id,)
+    ).fetchone()
+
+    if username != model_info['username']:
+        return "I served the writs with a smile so bland and I copied all the letters with a big round hand"
+
+    model_name = request.form.get('model_name')
+    author_name = request.form.get('author_name')
+    tags = request.form.get('tags')
+    short_desc = request.form.get('short_desc')
+    canonical = request.form.get('canonical')
+    short_desc = request.form.get('short_desc')
+    if not model_name:
+        model_name = model_info['model_name']
+    if not author_name:
+        author_name = model_info['author_name']
+    if not tags:
+        tags = model_info['tags']
+    if not short_desc:
+        short_desc = model_info['short_desc']
+    if not canonical:
+        canonical = model_info['canonical']
+        try:
+            canonical = canonical == 'true'
+        except ValueError:
+            return json.dumps({'response': 'failed', 'why': 'canonical_invalid_type'})
+    args = (model_name, author_name, tags, short_desc, canonical, model_id)
+
+    db.execute("UPDATE models SET name=?, author_name=?, tags=?, short_desc=?, canonical=? WHERE id=?", args)
+    db.commit()
 
     return json.dumps({'response': 'succeeded'})
