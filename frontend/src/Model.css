@@ -76,3 +76,7 @@ body {
     text-decoration: underline;
     cursor: pointer;
 }
+
+.upload-button {
+    background-color: var(--bg);
+}

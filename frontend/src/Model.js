@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
+import { FileUpload } from './Form.js';
 
 // Takes props username and isLoggedIn
 function Model(props){
@@ -156,7 +157,7 @@ function Model(props){
 
                 let deleteOptions = "";
                 if (modelDeleteStatus === 0){
-                    deleteOptions = <span className='delete-option' onClick={onDelete}>Delete</span>
+                    deleteOptions = <span className='delete-option' onClick={onDelete}>Delete Model</span>
                 }
                 else if (modelDeleteStatus === 1){
                     deleteOptions = <span className='delete-option'>Deleting model...</span>
@@ -168,10 +169,40 @@ function Model(props){
                     deleteOptions = <span className='delete-option'>Failed to delete model.</span>
                 }
 
+                function submitFiles(){
+                    // TODO
+                    console.log("So you want to submit files...")
+                }
+
+                let fileUpload = (
+                    <div>
+                        <FileUpload buttonClassName='upload-button' />
+                        <span onClick={submitFiles} className='delete-option'>Submit Files</span>
+                    </div>
+                )
+
+                let options = (
+                    <div id='edit-options' style={{'display': 'none'}}>
+                        <br/>
+                        {deleteOptions} <br/><br/>
+                        {fileUpload}
+                    </div>
+                );
+
+                function reveal(){
+                    let dis = document.getElementById('edit-options').style.display;
+                    if (dis === 'block'){
+                        document.getElementById('edit-options').style.display = 'none';
+                    }
+                    else {
+                        document.getElementById('edit-options').style.display = 'block';
+                    }
+                }
+
                 ownerOptions = (
                     <div className='owner-options'>
-                        You own this model. <br/><br/>
-                        {deleteOptions}
+                        You own this model. <span onClick={reveal} style={{'text-decoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
+                        {options}
                     </div>
                 );
             }
