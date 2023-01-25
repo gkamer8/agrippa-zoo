@@ -17,6 +17,10 @@
     color: var(--accent);
 }
 
+.sourced-node{
+    color: var(--accent);
+}
+
 .attr-row {
     background-color: var(--impressed);
     margin-bottom: 1em;

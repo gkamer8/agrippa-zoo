@@ -48,6 +48,12 @@ function Flow(props) {
                 return name.slice(0, dollarIndex);
             }
 
+            // type is input or output
+            function makeNodeFromMissing(name, type, id) {
+                let properClass = type === 'input' ? 'import-node' : 'export-node'
+                return { id: id, className: properClass, position: { x: 0, y: 0 }, data: { label: name }, type: type }
+            }
+
             function makeNodeFromTag(el, id) {
                 let attrs = el.attributes;
                 
@@ -61,10 +67,10 @@ function Flow(props) {
                 }
 
                 if (isSourcedBlock(el)){
-                    return { id: id, position: { x: 0, y: 0 }, data: { label: attrs['name'].value }, el: el }
+                    return { id: id, className: "sourced-node", position: { x: 0, y: 0 }, data: { label: attrs['name'].value }, el: el }
                 }
     
-                let title = `Untitled ${el.nodeName}`;
+                let title = el.nodeName == 'block' ? `Untitled ${el.nodeName}` : attrs['op'].value;
                 if (attrs['title']){
                     title = attrs['title'].value;
                 }
@@ -80,7 +86,7 @@ function Flow(props) {
             let newEdges = []
             let sourcedNames = []
             let sourcedIds = []
-            let k = 0;
+            let k = 0;  // this should always match up with i; for dumb reasons it's a separate var
             for (let i = 0; i < rootChildren.length; i++){
                 if (rootChildren[i].nodeName === 'block' || rootChildren[i].nodeName === 'node'){
                     newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
@@ -187,6 +193,40 @@ function Flow(props) {
                     }
                     else {
                         outputFromNode[key] = [id];
+                    }
+                }
+            }
+
+            // If there are still missing outputs/inputs with missing inputs/outputs, add them as nodes and make the proper connections
+            for (const key in outputFromNode) {
+                if (!inputToNode[key]){
+                    let id = newNodes.length+"";
+                    newNodes.push(makeNodeFromMissing(key, 'output', id));
+                    for(let i = 0; i < outputFromNode[key].length; i++){
+                        if (inputToNode[key]){
+                            if (!inputToNode[key].includes(id)){
+                                inputToNode[key].push(id);
+                            }
+                        }
+                        else {
+                            inputToNode[key] = [id];
+                        }
+                    }
+                }
+            }
+            for (const key in inputToNode) {
+                if (!outputFromNode[key]){
+                    let id = newNodes.length+"";
+                    newNodes.push(makeNodeFromMissing(key, 'input', id));
+                    for(let i = 0; i < inputToNode[key].length; i++){
+                        if (outputFromNode[key]){
+                            if (!outputFromNode[key].includes(id)){
+                                outputFromNode[key].push(id);
+                            }
+                        }
+                        else {
+                            outputFromNode[key] = [id];
+                        }
                     }
                 }
             }
