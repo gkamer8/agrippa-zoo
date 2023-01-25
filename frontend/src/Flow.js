@@ -10,7 +10,6 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './Flow.css';
-import { BACKEND_URL } from './Api';
 import dagre from 'dagre';
 
 const initialNodes = [];
@@ -18,69 +17,60 @@ const initialNodes = [];
 const initialEdges = [];
 // const initialEdges = [];
 
-const exampleFileText = ``
-
 function Flow(props) {
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-    const [modelLoadState, setModelLoadState] = useState(0);  // 0: not loaded, 1: loading, 2: loaded, 3: load failed 
-    const [fileText, setFileText] = useState(exampleFileText);
     const [details, setDetails] = useState(undefined);
     const [modelDoc, setModelDoc] = useState(undefined);
     const [focusedNodeControl, setFocusedNodeControl] = useState("");
 
-    const id = props.id;
+    const fileText = props.fileText;
+    // const id = props.id;
 
     const { fitView } = useReactFlow();
 
     useEffect(() => {
 
-        async function getModel() {
-            setModelLoadState(1);  // loading
-            console.log("Getting model")
-            let url = BACKEND_URL + "download/markup?id=" + id;  // this should get the index file
-            try {
-                const response = await fetch(url);
-                const xmlText = await response.text(); //extract JSON from the http response
-                setFileText(xmlText);
-                setModelLoadState(2);  // loaded
-            } 
-            catch (error) {
-                console.error(error);
-                setModelLoadState(3);
-            }
-        }
-
-        if (modelLoadState === 0){
-            getModel();
-        }
-
-    }, [modelLoadState, id]);
-
-    useEffect(() => {
-
-        function makeNodeFromTag(el, id) {
-            let attrs = el.attributes;
-            
-            if (el.nodeName === 'import'){
-                let name = attrs['from'].value;
-                return { id: id, className: "import-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'input', el: el }
-            }
-            else if (el.nodeName === 'export'){
-                let name = attrs['from'].value;
-                return { id: id, className: "export-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'output', el: el }
-            }
-
-            let title = `Untitled ${el.nodeName}`;
-            if (attrs['title']){
-                title = attrs['title'].value;
-            }
-
-            return { id: id, position: { x: 0, y: 0 }, data: { label: title }, el: el }
-        }
-
         // xmlDoc is a "Document" received from parser.parseFromString
         function getNodesAndEdgesFromXMLObj(modelDoc) {
+
+            function isSourcedBlock(el){
+                return el.nodeName === 'block' && el.attributes['src'];
+            }
+
+            // given an input src/output name, return the name of the block if it's sourced
+            // otherwise, return null
+            function getSourceName(name){
+                let dollarIndex = name.indexOf("$");
+                if (dollarIndex === -1) {
+                    return undefined;
+                }
+                return name.slice(0, dollarIndex);
+            }
+
+            function makeNodeFromTag(el, id) {
+                let attrs = el.attributes;
+                
+                if (el.nodeName === 'import'){
+                    let name = attrs['from'].value;
+                    return { id: id, className: "import-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'input', el: el }
+                }
+                else if (el.nodeName === 'export'){
+                    let name = attrs['from'].value;
+                    return { id: id, className: "export-node", position: { x: 0, y: 0 }, data: { label: name }, type: 'output', el: el }
+                }
+
+                if (isSourcedBlock(el)){
+                    return { id: id, position: { x: 0, y: 0 }, data: { label: attrs['name'].value }, el: el }
+                }
+    
+                let title = `Untitled ${el.nodeName}`;
+                if (attrs['title']){
+                    title = attrs['title'].value;
+                }
+    
+                return { id: id, position: { x: 0, y: 0 }, data: { label: title }, el: el }
+            }
     
             let inputToNode = {}  // input name -> array of block ids
             let outputFromNode = {}  // output name -> array of block ids
@@ -88,10 +78,19 @@ function Flow(props) {
             let rootChildren = modelDoc.children;
             let newNodes = []
             let newEdges = []
+            let sourcedNames = []
+            let sourcedIds = []
             let k = 0;
             for (let i = 0; i < rootChildren.length; i++){
                 if (rootChildren[i].nodeName === 'block' || rootChildren[i].nodeName === 'node'){
                     newNodes.push(makeNodeFromTag(rootChildren[i], k+""));
+
+                    // if it's a sourced block, add its name to sourcedNames and id to sourcedIds
+                    if (isSourcedBlock(rootChildren[i])){
+                        sourcedNames.push(rootChildren[i].attributes['name'].value);
+                        sourcedIds.push(k+"");
+                    }
+
                     // Find input and output names and add to inputToNode, outputFromNode dicts
                     let inputs = rootChildren[i].querySelectorAll("*>input");
                     for (let j = 0; j < inputs.length; j++){
@@ -158,6 +157,40 @@ function Flow(props) {
                     k++;
                 }
             }
+
+            // Go through sourced ids, add appropriate inputs and outputs
+            for(let i = 0; i < sourcedIds.length; i++){
+                let id = sourcedIds[i];
+                for (const key in outputFromNode) {
+                    let sn = getSourceName(key);
+                    if (sn !== sourcedNames[i]){
+                        continue;
+                    }
+                    if (inputToNode[key]){
+                        if (!inputToNode[key].includes(id)){
+                            inputToNode[key].push(id);
+                        }
+                    }
+                    else {
+                        inputToNode[key] = [id];
+                    }
+                }
+                for (const key in inputToNode) {
+                    let sn = getSourceName(key);
+                    if (sn !== sourcedNames[i]){
+                        continue;
+                    }
+                    if (outputFromNode[key]){
+                        if (!outputFromNode[key].includes(id)){
+                            outputFromNode[key].push(id);
+                        }
+                    }
+                    else {
+                        outputFromNode[key] = [id];
+                    }
+                }
+            }
+
             // Go through outputs, make edges from output block to all blocks with that input
             let existingEdges = {} // dictionary of "id->id"->true
             for (const key in outputFromNode) {

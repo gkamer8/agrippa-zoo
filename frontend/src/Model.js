@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import { Button, FileUpload, TextInput } from './Form.js';
+import { FileUpload, TextInput } from './Form.js';
 
 // Takes props username and isLoggedIn
 function Model(props){
