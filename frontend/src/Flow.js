@@ -86,6 +86,7 @@ function Flow(props) {
             let newEdges = []
             let sourcedNames = []
             let sourcedIds = []
+            let internalSources = [];
             let k = 0;  // this should always match up with i; for dumb reasons it's a separate var
             for (let i = 0; i < rootChildren.length; i++){
                 if (rootChildren[i].nodeName === 'block' || rootChildren[i].nodeName === 'node'){
@@ -97,6 +98,14 @@ function Flow(props) {
                         sourcedIds.push(k+"");
                     }
 
+                    // Go through child blocks and find if any are source blocks
+                    // If so, add to internal sources so we can remove their inputs/outputs
+                    let childBlocks = rootChildren[i].querySelectorAll("*>block");
+                    for (let j = 0; j < childBlocks.length; j++){
+                        if (isSourcedBlock(childBlocks[j])){
+                            internalSources.push(childBlocks[j].attributes['name'].value);
+                        }
+                    }
                     // Find input and output names and add to inputToNode, outputFromNode dicts
                     let inputs = rootChildren[i].querySelectorAll("*>input");
                     for (let j = 0; j < inputs.length; j++){
@@ -198,8 +207,12 @@ function Flow(props) {
             }
 
             // If there are still missing outputs/inputs with missing inputs/outputs, add them as nodes and make the proper connections
+            // Unless they are caused by interalized sourced blocks!
             for (const key in outputFromNode) {
                 if (!inputToNode[key]){
+                    if (internalSources.indexOf(getSourceName(key)) !== -1){
+                        continue;
+                    }
                     let id = newNodes.length+"";
                     newNodes.push(makeNodeFromMissing(key, 'output', id));
                     for(let i = 0; i < outputFromNode[key].length; i++){
@@ -216,6 +229,9 @@ function Flow(props) {
             }
             for (const key in inputToNode) {
                 if (!outputFromNode[key]){
+                    if (internalSources.indexOf(getSourceName(key)) !== -1){
+                        continue;
+                    }
                     let id = newNodes.length+"";
                     newNodes.push(makeNodeFromMissing(key, 'input', id));
                     for(let i = 0; i < inputToNode[key].length; i++){
