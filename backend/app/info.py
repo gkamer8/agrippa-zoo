@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from app.db import get_db
 import json
 from flask_cors import cross_origin
+from .download import get_folder_manifest_from_s3
 
 bp = Blueprint('info', __name__, url_prefix='/info')
 
@@ -10,6 +11,7 @@ def make_dict(row):
 
 DEFAULT_LIMIT = 100
 DEFAULT_OFFSET = 0
+MARKUP_EXTS = ["xml", "agr"]
 
 @bp.route('/manifest', methods=['GET'])
 @cross_origin()
@@ -64,6 +66,14 @@ def manifest():
 
     return data
 
+"""
+
+Takes required model id
+Optionally set file_manifest=1 to get all of the file paths, returned as file_paths=[path1, ...] in dict
+Same for markup_manifest, except only returns markup files
+Note that the paths returned do not include the s3 folder
+
+"""
 @bp.route('/model', methods=['GET'])
 @cross_origin()
 def model():
@@ -73,8 +83,28 @@ def model():
     
     db = get_db()
     model_info = db.execute(
-        "SELECT id, author_name, name, short_desc, canonical, tags, username, file_index FROM models WHERE id=?", (model_id,)
+        "SELECT * FROM models WHERE id=?", (model_id,)
     ).fetchone()
 
     structured = make_dict(model_info)
+
+    file_manifest = request.args.get('file_manifest')
+    if file_manifest:
+        try:
+            file_manifest = int(file_manifest)
+        except ValueError:
+            file_manifest = file_manifest == 'true'
+        if file_manifest:
+            files = get_folder_manifest_from_s3(structured['s3_storage_path'], exclude_prefix=True)
+            structured['file_paths'] = files
+
+    markup_manifest = request.args.get('markup_manifest')
+    if markup_manifest:
+        try:
+            markup_manifest = int(markup_manifest)
+        except ValueError:
+            markup_manifest = markup_manifest == 'true'
+        if markup_manifest:
+            files = get_folder_manifest_from_s3(structured['s3_storage_path'], exclude_prefix=True, allowed_extensions=MARKUP_EXTS)
+            structured['markup_paths'] = files
     return json.dumps(structured)

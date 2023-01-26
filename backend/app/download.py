@@ -13,7 +13,8 @@ BUCKET_NAME = 'agrippa-files'
 
 # Returns list of file paths in folder with name passed as argument "path"
 # Note: that is not a full HTTP response, so this should be used as a helper function
-def get_folder_manifest_from_s3(path):
+# exclude_prefix determines whether to include the s3 folder name or not
+def get_folder_manifest_from_s3(path, exclude_prefix=False, allowed_extensions=None):
 
     if not path:
         return []
@@ -27,6 +28,23 @@ def get_folder_manifest_from_s3(path):
 
     # Iterate through the contents
     for content in result.get('Contents', []):
+        spliddit = content['Key'].split("/")
+        # Don't add the folder itself
+        if len(spliddit) > 1 and spliddit[-1] == "":
+            continue
+        # If exclude prefix is true, excude it
+        if exclude_prefix and len(spliddit) > 1:
+            content['Key'] = content['Key'][content['Key'].index("/")+1:]
+        # If there are only some allowed extensions, only allow them
+        if allowed_extensions:
+            good = False
+            for ext in allowed_extensions:
+                this_ext = content['Key'].split(".")[-1]
+                if this_ext == ext:
+                    good = True
+                    break
+            if not good:
+                continue
         to_return.append(content['Key'])
 
     return to_return
@@ -60,7 +78,6 @@ def get_xml_from_s3(path, download):
 # returns the proper response (i.e., an endpoint function calling this should end with return get_readme_from_s3(...))
 def get_readme_from_s3(path):
     keys = get_folder_manifest_from_s3(path)
-    # Find .agr or 
     md_path = None
     for key in keys:
         splitted = key.split('/')[-1]
@@ -157,4 +174,4 @@ def get_file():
     # This may cause problems... will probably need to sanitize in some way...
     path = desired[1] + "/" + filename
 
-    return get_xml_from_s3(path)
+    return get_xml_from_s3(path, False)

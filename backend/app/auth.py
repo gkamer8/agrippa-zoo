@@ -73,7 +73,10 @@ def login():
         return json.dumps({'response': 'failed', 'why': 'wrong_password'})
 
     token = jwt.encode({'username' : match['username'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=AUTH_EXP_HOURS)}, AUTH_SECRET_KEY, AUTH_ALGO)
-    token = token.decode("utf-8")
+    try:
+        token = token.decode("utf-8")
+    except AttributeError:
+        pass
     return json.dumps({'response': 'succeeded', 'token': token})
 
 

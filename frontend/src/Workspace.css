@@ -20,8 +20,22 @@
     text-align: left;
     background-color: var(--impressed);
     padding: .5em;
+
+    display: flex;
 }
 
 .model-link {
+    text-decoration: underline;
+}
+
+.file-link {
+    margin-left: 1em;
+    cursor: pointer;
+    color: var(--accent);
+
+    display: inline-block;
+}
+
+.file-link-chosen {
     text-decoration: underline;
 }

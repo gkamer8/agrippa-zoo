@@ -329,8 +329,15 @@ function Flow(props) {
 
     function onNodeDoubleClick(event, node){
         let el = node.el;
+        if (el.nodeName === 'block' && el.attributes['src']){
+            props.onSourcedClick(el.attributes['src'].value);
+            return;
+        }
         if (el.nodeName === 'block'){
             setModelDoc(node.el);
+        }
+        else {
+            return;
         }
 
         function goToParent(el){
