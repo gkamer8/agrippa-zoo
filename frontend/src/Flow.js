@@ -22,7 +22,6 @@ function Flow(props) {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [details, setDetails] = useState(undefined);
     const [modelDoc, setModelDoc] = useState(undefined);
-    const [focusedNodeControl, setFocusedNodeControl] = useState("");
 
     const fileText = props.fileText;
     // const id = props.id;
@@ -70,7 +69,7 @@ function Flow(props) {
                     return { id: id, className: "sourced-node", position: { x: 0, y: 0 }, data: { label: attrs['name'].value }, el: el }
                 }
     
-                let title = el.nodeName == 'block' ? `Untitled ${el.nodeName}` : attrs['op'].value;
+                let title = el.nodeName === 'block' ? `Untitled ${el.nodeName}` : attrs['op'].value;
                 if (attrs['title']){
                     title = attrs['title'].value;
                 }
@@ -308,7 +307,7 @@ function Flow(props) {
         setEdges(newEdges);
 
         // fitView();  // seems to work only sometimes? to investigate.
-    }, [fileText, setNodes, setEdges, modelDoc, fitView]);
+    }, [setNodes, setEdges, modelDoc, fitView]);
 
 
     useEffect(() => {
@@ -343,6 +342,26 @@ function Flow(props) {
         setDetails(newDetails);
     }
 
+    function goToParent(){
+        if (modelDoc){
+            setModelDoc(modelDoc.parentNode);
+        }
+    }
+
+    let focusedNodeControl = "";
+    // This is a bit hacky - the root of the file's parent is a document, not null
+    // but that document's parent is null - so we don't show a Back button if the parent of the parent of the element is null
+    if (modelDoc && modelDoc.parentNode.parentNode === null){
+        focusedNodeControl = "";
+    }
+    else {
+        focusedNodeControl = (
+            <div onClick={goToParent} className='focused-node-control'>
+                {"<< Back"}
+            </div>
+        )
+    }
+
     function onNodeDoubleClick(event, node){
         let el = node.el;
         if (el.nodeName === 'block' && el.attributes['src']){
@@ -355,33 +374,6 @@ function Flow(props) {
         else {
             return;
         }
-
-        function goToParent(el){
-            // Super hacky
-            // We currently want to return to the view of the parent node of el
-            // When we do that, we want the goToParent to send us to the parent of the parent
-            // Suppose that that is the root - then *its* parent is actually a "#document"
-            // But then the #document's parent is null. so this is the solution.
-            if (el.parentNode.parentNode.parentNode == null){
-                setFocusedNodeControl("");
-            }
-            else {
-                let newFocusedNodeControl = (
-                    <div onClick={() => goToParent(el.parentNode)} className='focused-node-control'>
-                        {"<< Back"}
-                    </div>
-                )
-                setFocusedNodeControl(newFocusedNodeControl);
-            }
-            setModelDoc(el.parentNode);
-        }
-
-        let newFocusedNodeControl = (
-            <div onClick={() => goToParent(el)} className='focused-node-control'>
-                {"<< Back"}
-            </div>
-        )
-        setFocusedNodeControl(newFocusedNodeControl);
     }
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
