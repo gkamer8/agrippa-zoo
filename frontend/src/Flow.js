@@ -74,7 +74,7 @@ function Flow(props) {
                     title = attrs['title'].value;
                 }
     
-                return { id: id, position: { x: 0, y: 0 }, data: { label: title }, el: el }
+                return { id: id, className: "regular-node", position: { x: 0, y: 0 }, data: { label: title }, el: el }
             }
     
             let inputToNode = {}  // input name -> array of block ids
@@ -273,9 +273,14 @@ function Flow(props) {
             g.setGraph({});
             g.setDefaultEdgeLabel(function() { return {}; });
             for (let i = 0; i < nodes.length; i++){
-                // 150 and 50 are literally just heuristics; I had a hard time figuring out how
-                //  to retrieve height/width data
-                g.setNode(nodes[i].id, {width: 150, height: 50});
+                // This is a heuristic to figure out the rendered widths of the nodes
+                // This is the reason we choose a monospace font for the labels
+                // It's pretty dumb; can you figure out a better way?
+                let lab = nodes[i].data.label
+                let labLen = lab.length;
+                console.log(labLen)
+                let newWidth = 20 + labLen * 7.15;  // 20 for the padding
+                g.setNode(nodes[i].id, {width: newWidth, height: 50});
             }
     
             for (let i = 0; i < edges.length; i++){
@@ -287,7 +292,7 @@ function Flow(props) {
             let arrangedNodes = [];
             for (let i = 0; i < nodes.length; i++){
                 let newNode = Object.assign({}, nodes[i]);
-                newNode.position.x = g.node(newNode.id).x;
+                newNode.position.x = g.node(newNode.id).x - g.node(newNode.id).width / 2;
                 newNode.position.y = g.node(newNode.id).y;
                 arrangedNodes.push(newNode);
             }
@@ -377,6 +382,7 @@ function Flow(props) {
     }
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+    
 
     return (
         <div style={{ width:'100%', height: '100%', display: 'flex'}}>

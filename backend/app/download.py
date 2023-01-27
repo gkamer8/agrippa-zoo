@@ -19,6 +19,7 @@ BUCKET_NAME = 'agrippa-files'
 # exclude_prefix determines whether to include the s3 folder name or not
 def get_folder_manifest_from_s3(path, exclude_prefix=False, allowed_extensions=None):
 
+
     if not path:
         return []
 
@@ -51,7 +52,7 @@ def get_folder_manifest_from_s3(path, exclude_prefix=False, allowed_extensions=N
         to_return.append(content['Key'])
 
     return to_return
-
+    
 # Takes the full path from the bucket to a file as well as whether it should be downloaded
 # returns the proper response (i.e., an endpoint function calling this should end with return get_xml_from_s3(...))
 def get_xml_from_s3(path, download):

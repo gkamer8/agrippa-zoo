@@ -108,6 +108,9 @@ def model():
         except ValueError:
             markup_manifest = markup_manifest == 'true'
         if markup_manifest:
-            files = get_folder_manifest_from_s3(structured['s3_storage_path'], exclude_prefix=True, allowed_extensions=MARKUP_EXTS)
+            try:
+                files = get_folder_manifest_from_s3(structured['s3_storage_path'], exclude_prefix=True, allowed_extensions=MARKUP_EXTS)
+            except:
+                return json.dumps({'response': 'failed', 'why': 'get_folder_manifest_from_s3_failed'})
             structured['markup_paths'] = files
     return json.dumps(structured)

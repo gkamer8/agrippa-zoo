@@ -7,18 +7,34 @@
 }
 
 .import-node {
+    width: unset;
+    font-family: 'Courier New', Courier, monospace;
     background-color: var(--impressed);
     color: var(--accent);
     border-width: 0px;
+    padding: 10px;
+    font-size: 12px;
 }
 
 .export-node {
+    width: unset;
+    font-family: 'Courier New', Courier, monospace;
     background-color: var(--impressed);
     color: var(--accent);
+    font-size: 12px;
 }
 
 .sourced-node{
+    width: unset;
+    font-family: 'Courier New', Courier, monospace;
     color: var(--accent);
+    font-size: 12px;
+}
+
+.regular-node {
+    width: unset;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
 }
 
 .attr-row {
