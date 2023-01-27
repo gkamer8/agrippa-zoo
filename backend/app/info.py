@@ -86,6 +86,9 @@ def model():
         "SELECT * FROM models WHERE id=?", (model_id,)
     ).fetchone()
 
+    if not model_info:
+        return json.dumps({'response': 'failed', 'why': 'no_model_exists'})
+
     structured = make_dict(model_info)
 
     file_manifest = request.args.get('file_manifest')

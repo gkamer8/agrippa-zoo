@@ -1,6 +1,6 @@
 import { BACKEND_URL } from './Api';
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -20,8 +20,11 @@ function Model(props){
     const [modelDeleteStatus, setModelDeleteStatus] = useState(0);
     const [submitFilesStatus, setSubmitFilesStatus] = useState(0);
     const [submitModelNameStatus, setSubmitModelNameStatus] = useState(0);
+    const [submitAuthorNameStatus, setSubmitAuthorNameStatus] = useState(0);
     
     const [fileArray, setFileArray] = useState([]);
+
+    const [isEditMode, setIsEditMode] = useState(false);
 
     let { id } = useParams();
 
@@ -61,6 +64,14 @@ function Model(props){
 
     }, [id])
 
+    // Set the text inputs to the appropriate values when the model is in edit model
+    useEffect(() => {
+        if (isEditMode){
+            document.getElementById("model-name-text-box").value = modelInfo['name'];
+            document.getElementById("model-author-text-box").value = modelInfo['author_name'];
+        }
+    }, [isEditMode, modelInfo]);
+
     if (modelLoaded === false && modelLoadFailed === false){
         return (
             <div>Loading model...</div>
@@ -78,9 +89,7 @@ function Model(props){
         let canonical = modelInfo['canonical'];
         let tags = JSON.parse(modelInfo['tags']);
         let md_text = modelReadme;
-
-        let readme_header = "";
-
+        
         let canon = ""
         if (canonical){
             canon = (
@@ -88,6 +97,7 @@ function Model(props){
             );
         }
 
+        let readme_header = "";
         let tag_arr = []
         // Go through the tags, make it an array that can be passed like model squares is
         for (const [key, value] of Object.entries(tags)) {
@@ -133,235 +143,286 @@ function Model(props){
         let modelAuthorComponent = (
             <div style={{'display': 'inline-block'}}>
                 <span style={{'display': 'inline'}} id='true-model-author'>{model_author}</span>
-                <TextInput style={{'display': 'none'}} id='model-author-text-box' />
             </div>
         )
+
+        // For the edit button
+        function reveal(){
+            if (isEditMode){
+                setIsEditMode(false)
+            }
+            else {
+                setIsEditMode(true);
+            }
+        }
+
         let ownerOptions = "";
         if(props.isLoggedIn){
             if (modelInfo.username === props.username){
-                // Delete files button
-                async function onDelete(){
-                    
-                    if (!window.confirm("Are you sure you want to delete this model?")) {
-                        return
-                    }
-
-                    setModelDeleteStatus(1);
-                    let fileData = new FormData();
-                    fileData.append('id', id);
-                    let url = BACKEND_URL + "update/delete"
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'x-access-token': localStorage.getItem("auth_token"),
-                            },
-                            body: fileData
-                         });
-                        const myJson = await response.json(); //extract JSON from the http response
-            
-                        console.log(myJson);
-            
-                        if (myJson.response === 'failed'){
-                            setModelDeleteStatus(3);
-                        }
-                        else {
-                            setModelDeleteStatus(2);
-                        }
-                    } 
-                    catch (error) {
-                        console.error(error);
-                        setModelDeleteStatus(3);
-                    }                    
-                }
-
-                let deleteOptions = "";
-                if (modelDeleteStatus === 0){
-                    deleteOptions = <span className='delete-option' onClick={onDelete}>Delete Model</span>
-                }
-                else if (modelDeleteStatus === 1){
-                    deleteOptions = <span className='delete-option'>Deleting model...</span>
-                }
-                else if (modelDeleteStatus === 2){
-                    deleteOptions = <span className='delete-option'>Model deleted.</span>
-                }
-                else {
-                    deleteOptions = <span className='delete-option'>Failed to delete model.</span>
-                }
-
-                // Submit files button
-                function handleFileChange(e){
-                    let fileList = e.target.files;
-                    let n = fileList.length;
-                    let newFileArray = [];
-                    for (let i = 0; i < n; i++){
-                        newFileArray.push(fileList[i]);
-                    }
-                    setFileArray(newFileArray);
-                }
-
-                async function submitFiles(){
-
-                    setSubmitFilesStatus(1);
-                    let fileData = new FormData();
-                    for (let i = 0; i < fileArray.length; i++){
-                        fileData.append('file' + i, fileArray[i]);
-                    }
-                    fileData.append('id', id);
-                    let url = BACKEND_URL + "update/upload"
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'x-access-token': localStorage.getItem("auth_token"),
-                            },
-                            body: fileData
-                         });
-                        const myJson = await response.json(); //extract JSON from the http response
-            
-                        console.log(myJson);
-            
-                        if (myJson.response === 'failed'){
-                            setSubmitFilesStatus(3);
-                        }
-                        else {
-                            setSubmitFilesStatus(2);
-                        }
-                    } 
-                    catch (error) {
-                        console.error(error);
-                        setSubmitFilesStatus(3);
-                    }
-                }
-
-                let submitFilesResponse = "";
-                if (submitFilesStatus === 1){
-                    submitFilesResponse = <div><br/>Submitting files...</div>
-                }
-                else if (submitFilesStatus === 2){
-                    submitFilesResponse = <div><br/>Files successfully uploaded.</div>
-                }
-                else if (submitFilesStatus === 3){
-                    submitFilesResponse = <div><br/>Failed to upload files.</div>
-                }
-
-                let fileUpload = (
-                    <div>
-                        <FileUpload onChange={handleFileChange} buttonClassName='upload-button' />
-                        <span onClick={submitFiles} className='delete-option'>Submit Files</span>
-                        {submitFilesResponse}
-                    </div>
-                )
-
-                let options = (
-                    <div id='edit-options' style={{'display': 'none'}}>
-                        <br/>
-                        {deleteOptions} <br/><br/>
-                        {fileUpload}
-                    </div>
-                );
-
-                function reveal(){
-                    let dis = document.getElementById('edit-options').style.display;
-                    if (dis === 'block'){
-                        document.getElementById('edit-options').style.display = 'none';
-                    }
-                    else {
-                        document.getElementById('edit-options').style.display = 'block';
-                    }
-
-                    let nameDis = document.getElementById('normal-model-name').style.display;
-                    if (nameDis === 'block'){
-                        document.getElementById('normal-model-name').style.display = 'none';
-                        document.getElementById('editable-model-name').style.display = 'block';
-                    }
-                    else {
-                        document.getElementById('normal-model-name').style.display = 'block';
-                        document.getElementById('editable-model-name').style.display = 'none';
-                    }
-                    document.getElementById('model-name-text-box').value = model_name;
-
-                    let authorDis = document.getElementById('true-model-author').style.display;
-                    if (authorDis === 'inline'){
-                        document.getElementById('true-model-author').style.display = 'none';
-                        document.getElementById('model-author-text-box').style.display = 'inline';
-                    }
-                    else {
-                        document.getElementById('true-model-author').style.display = 'inline';
-                        document.getElementById('model-author-text-box').style.display = 'none';
-                    }
-                    document.getElementById('model-author-text-box').value = model_author;
-                }
-
                 ownerOptions = (
                     <div className='owner-options'>
                         You own this model. <span onClick={reveal} style={{'text-decoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
-                        {options}
                     </div>
                 );
-
-                async function submitModelName(){
-
-                    setSubmitModelNameStatus(1);
-                    let fileData = new FormData();
-                    fileData.append('id', id);
-                    fileData.append('model_name', document.getElementById('model-name-text-box').value)
-                    let url = BACKEND_URL + "update/edit"
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'x-access-token': localStorage.getItem("auth_token"),
-                            },
-                            body: fileData
-                         });
-                        const myJson = await response.json(); //extract JSON from the http response
-            
-                        console.log(myJson);
-            
-                        if (myJson.response === 'failed'){
-                            setSubmitModelNameStatus(3);
-                        }
-                        else {
-                            document.getElementById('model_name').innerHTML = document.getElementById('model-name-text-box').value;
-                            setSubmitModelNameStatus(2);
-                        }
-                    } 
-                    catch (error) {
-                        console.error(error);
-                        setSubmitModelNameStatus(3);
-                    }
-                }
-
-                let modelNameStatusComponent = ""
-                if (submitModelNameStatus === 1){
-                    modelNameStatusComponent = <div className='model-name-status-text'>Submitting new model name...</div>
-                }
-                else if (submitModelNameStatus === 2){
-                    modelNameStatusComponent = <div className='model-name-status-text'>Model name successfully changed.</div>
-                }
-                else if (submitModelNameStatus === 3){
-                    modelNameStatusComponent = <div className='model-name-status-text'>Failed to change model name.</div>
-                }
-
-                modelName = (
-                    <div id='model-name-comp'>
-                        <div id='normal-model-name' style={{'display': 'block'}}>
-                            <div className='model_name' id='model_name'>
-                                {model_name}
-                            </div>
-                        </div>
-                        <div id='editable-model-name' style={{'display': 'none'}}>
-                            <TextInput id='model-name-text-box' className='model_name editable-model-name' />
-                            <div onClick={submitModelName} style={{'margin-bottom': '1em', 'text-decoration': 'underline', 'cursor': 'pointer', 'display': 'inline-block'}}>Submit Name Change</div>
-                            {modelNameStatusComponent}
-                        </div>
-                    </div>
-                )
             }
         }
         
-        const listTagGroups = tag_arr.map(makeTagGroup);
+        let listTagGroups = tag_arr.map(makeTagGroup);
+
+        if (isEditMode){
+
+            // First: the model name text box
+            
+            let modelNameStatusComponent = ""
+            if (submitModelNameStatus === 1){
+                modelNameStatusComponent = <div className='model-name-status-text'>Submitting new model name...</div>
+            }
+            else if (submitModelNameStatus === 2){
+                modelNameStatusComponent = <div className='model-name-status-text'>Model name successfully changed.</div>
+            }
+            else if (submitModelNameStatus === 3){
+                modelNameStatusComponent = <div className='model-name-status-text'>Failed to change model name.</div>
+            }
+
+            async function submitModelName(){
+
+                setSubmitModelNameStatus(1);
+                let fileData = new FormData();
+                fileData.append('id', id);
+                let newModelName = document.getElementById('model-name-text-box').value;
+                fileData.append('model_name', newModelName)
+                let url = BACKEND_URL + "update/edit"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                     });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        setSubmitModelNameStatus(3);
+                    }
+                    else {
+                        let newModelInfo = {...modelInfo}
+                        newModelInfo['name'] = newModelName;
+                        setModelInfo(newModelInfo);
+                        setSubmitModelNameStatus(2);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    setSubmitModelNameStatus(3);
+                }
+            }
+
+            modelName = (
+                <div id='model-name-comp'>
+                    <div id='editable-model-name'>
+                        <TextInput id='model-name-text-box' className='model_name editable-model-name' />
+                        <div onClick={submitModelName} style={{'margin-bottom': '1em', 'text-decoration': 'underline', 'cursor': 'pointer', 'display': 'inline-block'}}>Submit Name Change</div>
+                        {modelNameStatusComponent}
+                    </div>
+                </div>
+            )
+            
+            // Now that the model name stuff is taken care of, now for the delete option
+
+            async function onDelete(){
+                    
+                if (!window.confirm("Are you sure you want to delete this model?")) {
+                    return
+                }
+
+                setModelDeleteStatus(1);
+                let fileData = new FormData();
+                fileData.append('id', id);
+                let url = BACKEND_URL + "update/delete"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        setModelDeleteStatus(3);
+                    }
+                    else {
+                        setModelDeleteStatus(2);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    setModelDeleteStatus(3);
+                }                    
+            }
+
+            let deleteOptions = "";
+            if (modelDeleteStatus === 0){
+                deleteOptions = <span className='delete-option' onClick={onDelete}>Delete Model</span>
+            }
+            else if (modelDeleteStatus === 1){
+                deleteOptions = <span className='delete-option'>Deleting model...</span>
+            }
+            else if (modelDeleteStatus === 2){
+                deleteOptions = <span className='delete-option'>Model deleted.</span>
+            }
+            else if (modelDeleteStatus === 3){
+                deleteOptions = <span className='delete-option'>Failed to delete model.</span>
+            }
+
+            // Submit files button
+            function handleFileChange(e){
+                let fileList = e.target.files;
+                let n = fileList.length;
+                let newFileArray = [];
+                for (let i = 0; i < n; i++){
+                    newFileArray.push(fileList[i]);
+                }
+                setFileArray(newFileArray);
+            }
+
+            async function submitFiles(){
+
+                setSubmitFilesStatus(1);
+                let fileData = new FormData();
+                for (let i = 0; i < fileArray.length; i++){
+                    fileData.append('file' + i, fileArray[i]);
+                }
+                fileData.append('id', id);
+                let url = BACKEND_URL + "update/upload"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        setSubmitFilesStatus(3);
+                    }
+                    else {
+                        setSubmitFilesStatus(2);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    setSubmitFilesStatus(3);
+                }
+            }
+
+            let submitFilesResponse = "";
+            if (submitFilesStatus === 1){
+                submitFilesResponse = <div><br/>Submitting files...</div>
+            }
+            else if (submitFilesStatus === 2){
+                submitFilesResponse = <div><br/>Files successfully uploaded.</div>
+            }
+            else if (submitFilesStatus === 3){
+                submitFilesResponse = <div><br/>Failed to upload files.</div>
+            }
+
+            let fileUpload = (
+                <div>
+                    <FileUpload onChange={handleFileChange} buttonClassName='upload-button' />
+                    <span onClick={submitFiles} className='delete-option'>Submit Files</span>
+                    {submitFilesResponse}
+                </div>
+            )
+
+            // Now author name
+
+            async function submitAuthorName(){
+                setSubmitAuthorNameStatus(1);
+                let fileData = new FormData();
+                let newAuthorName = document.getElementById('model-author-text-box').value;
+                fileData.append('id', id);
+                fileData.append('author_name', newAuthorName);
+                let url = BACKEND_URL + "update/edit"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        setSubmitAuthorNameStatus(3);
+                    }
+                    else {
+                        let newModelInfo = {...modelInfo}
+                        newModelInfo['author_name'] = newAuthorName;
+                        setModelInfo(newModelInfo);
+                        setSubmitAuthorNameStatus(2);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    setSubmitAuthorNameStatus(3);
+                }
+            }
+
+            let modelAuthorStatusComponent = "";
+            if (submitAuthorNameStatus === 1){
+                modelAuthorStatusComponent = (
+                    <span style={{'margin-left': '.5em'}}>Submitting...</span>
+                )
+            }
+            else if (submitAuthorNameStatus === 2){
+                modelAuthorStatusComponent = (
+                    <span style={{'margin-left': '.5em'}}>Submitted successfully.</span>
+                )
+            }
+            else if (submitAuthorNameStatus === 3){
+                modelAuthorStatusComponent = (
+                    <span style={{'margin-left': '.5em'}}>Failed.</span>
+                )
+            }
+
+            modelAuthorComponent = (
+                <div style={{'display': 'inline-block'}}>
+                    <div style={{'display': 'inline-block', 'margin-right': '.5em'}}>
+                        <TextInput id='model-author-text-box' />
+                    </div>
+                    <span onClick={submitAuthorName} className='delete-option'>Submit</span>
+                    {modelAuthorStatusComponent}
+                </div>
+            )
+
+            // This should be at bottom of this whole thing
+            ownerOptions = (
+                <div className='owner-options'>
+                    You own this model. <span onClick={reveal} style={{'text-decoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
+                    <div style={{'margin-top': '1em'}}>
+                        {deleteOptions}
+                    </div>
+                    <div style={{'margin-top': '1em'}}>
+                        {fileUpload}
+                    </div>
+                </div>
+            )
+        };
+
         return (
             <div className='content-container'>
                 <div className='model_card'>

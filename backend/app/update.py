@@ -110,7 +110,7 @@ def edit(username):
     canonical = request.form.get('canonical')
     short_desc = request.form.get('short_desc')
     if not model_name:
-        model_name = model_info['model_name']
+        model_name = model_info['name']
     if not author_name:
         author_name = model_info['author_name']
     if not tags:
