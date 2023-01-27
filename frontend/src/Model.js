@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import { FileUpload, TextInput } from './Form.js';
+import { FileUpload, TextInput, Button } from './Form.js';
 
 // Takes props username and isLoggedIn
 function Model(props){
@@ -21,6 +21,10 @@ function Model(props){
     const [submitFilesStatus, setSubmitFilesStatus] = useState(0);
     const [submitModelNameStatus, setSubmitModelNameStatus] = useState(0);
     const [submitAuthorNameStatus, setSubmitAuthorNameStatus] = useState(0);
+    const [submitTagsStatus, setSubmitTagsStatus] = useState(0);
+
+    const [inputTags, setInputTags] = useState([]);
+    const [outputTags, setOutputTags] = useState([]);
     
     const [fileArray, setFileArray] = useState([]);
 
@@ -64,13 +68,19 @@ function Model(props){
 
     }, [id])
 
-    // Set the text inputs to the appropriate values when the model is in edit model
+    // Set the text inputs and tags to the appropriate values when the model is in edit model
     useEffect(() => {
         if (isEditMode){
             document.getElementById("model-name-text-box").value = modelInfo['name'];
             document.getElementById("model-author-text-box").value = modelInfo['author_name'];
+
+            let inputTags = JSON.parse(modelInfo['tags'])['input']
+            let outputTags = JSON.parse(modelInfo['tags'])['output']
+            
+            setInputTags(inputTags);
+            setOutputTags(outputTags);
         }
-    }, [isEditMode, modelInfo]);
+    }, [isEditMode, modelInfo, setInputTags, setOutputTags]);
 
     if (modelLoaded === false && modelLoadFailed === false){
         return (
@@ -168,6 +178,7 @@ function Model(props){
         }
         
         let listTagGroups = tag_arr.map(makeTagGroup);
+        let modelTags = (<div>{listTagGroups}</div>)
 
         if (isEditMode){
 
@@ -409,6 +420,192 @@ function Model(props){
                 </div>
             )
 
+            function deleteInputTag(index){
+                let newInputTags = [...inputTags];
+                newInputTags.splice(index, 1);
+                setInputTags(newInputTags);
+            }
+        
+            function deleteOutputTag(index){
+                let newOutputTags = [...outputTags];
+                newOutputTags.splice(index, 1);
+                setOutputTags(newOutputTags);
+            }
+        
+            function makeInputTag(index){
+                return (
+                    <div className='tag-box' key={index}>
+                        {inputTags[index]} <span onClick={() => deleteInputTag(index)} className='tag-delete'>X</span>
+                    </div>
+                )
+            }
+        
+            function makeOutputTag(index){
+                return (
+                    <div className='tag-box' key={index}>
+                        {outputTags[index]} <span onClick={() => deleteOutputTag(index)} className='tag-delete'>X</span>
+                    </div>
+                )
+            }
+        
+            function addInputTag(){
+                let tag = document.getElementById("input-tag").value;
+        
+                if (!tag){
+                    return;
+                }
+        
+                if (tag.indexOf("\"") !== -1){
+                    alert("You cannot place a quotation mark inside a tag.")
+                    return;
+                }
+        
+                let newInputTags = [...inputTags];
+                newInputTags.push(tag);
+                setInputTags(newInputTags);
+                document.getElementById("input-tag").value = "";
+            }
+
+            function addOutputTag(){
+                let tag = document.getElementById("output-tag").value;
+        
+                if (!tag){
+                    return;
+                }
+        
+                if (tag.indexOf("\"") !== -1){
+                    alert("You cannot place a quotation mark inside a tag.")
+                    return;
+                }
+        
+                let newOutputTags = [...outputTags];
+                newOutputTags.push(tag);
+                setOutputTags(newOutputTags);
+                document.getElementById("output-tag").value = "";
+            }
+
+            // Now onto the model tags
+            function handleOutputTagKeyDown(e){
+                if (e.keyCode === 13){  // enter key
+                    addOutputTag();
+                }
+            }
+        
+            function handleInputTagKeyDown(e){
+                if (e.keyCode === 13){  // enter key
+                    addInputTag();
+                }
+            }
+
+            function getTagFormData(){
+                let inputTagString = "["
+                for (let i = 0; i < inputTags.length; i++){
+                    if(i === inputTags.length - 1){
+                        inputTagString += "\"" + inputTags[i] + "\"";
+                    }
+                    else {
+                        inputTagString += "\"" + inputTags[i] + "\", ";
+                    }
+                }
+                inputTagString += "]"
+        
+                let outputTagString = "["
+                for (let i = 0; i < outputTags.length; i++){
+                    if(i === outputTags.length - 1){
+                        outputTagString += "\"" + outputTags[i] + "\"";
+                    }
+                    else {
+                        outputTagString += "\"" + outputTags[i] + "\", ";
+                    }
+                }
+                outputTagString += "]"
+                return `{"input": ${inputTagString}, "output": ${outputTagString}}`;
+            }
+
+            async function submitTags(){
+                let fileData = new FormData();
+                let tagData = getTagFormData();
+
+                setSubmitTagsStatus(1);
+
+                fileData.append('id', id);
+                fileData.append('tags', tagData);
+
+                let url = BACKEND_URL + "update/edit"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        setSubmitTagsStatus(3);
+                    }
+                    else {
+                        let newModelInfo = {...modelInfo}
+                        newModelInfo['tags'] = tagData;
+                        setModelInfo(newModelInfo);
+                        setSubmitTagsStatus(2);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    setSubmitTagsStatus(3);
+                }
+
+            }
+
+            const inputTagLabels = [...Array(inputTags.length).keys()].map(makeInputTag);
+            const outputTagLabels = [...Array(outputTags.length).keys()].map(makeOutputTag);
+
+            let submitTagsStatusComponent = ""
+            if (submitTagsStatus === 1){
+                submitTagsStatusComponent = (
+                    <span>Submitting tags...</span>
+                )
+            }
+            else if (submitTagsStatus === 2){
+                submitTagsStatusComponent = (
+                    <span>Tags successfully submitted.</span>
+                )
+            }
+            else if (submitTagsStatus === 3){
+                submitTagsStatusComponent = (
+                    <span>Failed to submit tags.</span>
+                )
+            }
+            modelTags = (
+                <React.Fragment>
+                    <br/>
+                    <div className='form-row'>
+                        <TextInput id="input-tag" onKeyDown={handleInputTagKeyDown} placeholder="Input Tag" />
+                    </div>
+                    <div className='form-row'>
+                        <Button onClick={addInputTag} value="Add Input Tag" />
+                    </div>
+                    {inputTagLabels}
+                    <div className='form-row'>
+                        <TextInput id="output-tag" onKeyDown={handleOutputTagKeyDown} placeholder="Output Tag" />
+                    </div>
+                    <div className='form-row'>
+                        <Button onClick={addOutputTag} value="Add Output Tag" />
+                    </div>
+                    {outputTagLabels}
+                    <div className='form-row'>
+                        <Button onClick={submitTags} value="Submit Tags" />
+                    </div>
+                    <div className='form-row'>
+                        {submitTagsStatusComponent}
+                    </div>
+                </React.Fragment>
+            )
+
             // This should be at bottom of this whole thing
             ownerOptions = (
                 <div className='owner-options'>
@@ -442,7 +639,7 @@ function Model(props){
                         <Link to={"/workspace/" + id}><span className='download-text'>View in Workspace</span></Link>
                     </div>
                     <div className='short_desc'>{short_desc}</div>
-                    {listTagGroups}
+                    {modelTags}
                     {readme_header}
                     <ReactMarkdown>
                         {md_text}
