@@ -4,6 +4,9 @@ from app.db import get_db
 import boto3
 from flask_cors import cross_origin
 from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
+import json
+import io
+import zipfile
 
 
 bp = Blueprint('download', __name__, url_prefix='/download')
@@ -72,6 +75,21 @@ def get_xml_from_s3(path, download):
         to_return.headers["Content-Disposition"] = f"attachment; filename=\"{filename}\""
 
     return to_return
+
+# Returns the bytes from an s3 object
+# Takes path to the object and an s3 connection (i.e. s3 = boto3.client(...))
+# Does not return a request - functions calling this should process the bytes and send its own request.
+def get_file_bytes_from_s3(path, s3):
+    # Retrieve the file
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=path)
+    except:
+        # Probably a no such key error
+        return ""
+
+    resp_bytes = response['Body'].read()
+
+    return resp_bytes
 
 # Takes path to the model folder, finds the readme, and returns it
 # NOTE: this should probably be designed differently
@@ -175,3 +193,51 @@ def get_file():
     path = desired[1] + "/" + filename
 
     return get_xml_from_s3(path, False)
+
+# Takes a model ID and downloads the project into a zip file
+# Also takes "download", which specifies whether the request is meant to trigger a browser download.
+@bp.route('/project', methods=['GET'])
+@cross_origin()
+def get_project():
+    model_id = request.args.get('id')
+    if model_id is None:
+        return "I am the very model of a modern major general"
+
+    model_id = int(model_id)
+
+    db = get_db()
+    desired = db.execute(
+        "SELECT id, s3_storage_path, name FROM models WHERE id=?", (model_id,)
+    ).fetchone()
+
+    if not desired:
+        return "I've information vegetable animal and mineral"
+
+    download = request.args.get('download')
+    try:
+        download = int(download)
+    except:
+        download = False
+
+    mani = get_folder_manifest_from_s3(desired['s3_storage_path'])
+
+    file_bytes = []
+    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+    for fname in mani:
+        file_bytes.append(get_file_bytes_from_s3(fname, s3))
+
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, mode="w") as zip_file:
+        for i, my_bytes in enumerate(file_bytes):
+            zip_file.writestr(mani[i], my_bytes)
+    zip_buffer.seek(0)
+    resp_str = zip_buffer.read()
+
+    to_return = make_response(resp_str)
+    to_return.headers["Content-Type"] = "application/xml"
+
+    if download:
+        filename = desired['name'] + ".zip"
+        to_return.headers["Content-Disposition"] = f"attachment; filename=\"{filename}\""
+
+    return to_return

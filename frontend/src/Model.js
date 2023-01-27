@@ -681,8 +681,8 @@ function Model(props){
                         <span className='author'>Author: </span>{modelAuthorComponent}
                     </div>
                     <div className='download-block'>
-                        <a href={BACKEND_URL + "download/markup?download=1&id=" + id} download={true}>
-                            <span className='download-text'>Download Markup</span>
+                        <a href={BACKEND_URL + "download/project?download=1&id=" + id} download={true}>
+                            <span className='download-text'>Download Project</span>
                         </a>
                     </div>
                     <div className='download-block'>
