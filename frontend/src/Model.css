@@ -31,11 +31,6 @@ body {
     margin-top: 1em;
 }
 
-.download-text {
-    text-decoration: underline;
-    text-decoration-color: var(--text);
-}
-
 .short_desc {
     margin-top: 1em;
 }

@@ -682,11 +682,13 @@ function Model(props){
                     </div>
                     <div className='download-block'>
                         <a href={BACKEND_URL + "download/project?download=1&id=" + id} download={true}>
-                            <span className='download-text'>Download Project</span>
+                            <Button value="Download ↴" />
                         </a>
                     </div>
                     <div className='download-block'>
-                        <Link to={"/workspace/" + id}><span className='download-text'>View in Workspace</span></Link>
+                        <Link to={"/workspace/" + id}>
+                            <Button value="View in Workspace" />
+                        </Link>
                     </div>
                     <div className='short_desc'>{short_desc}</div>
                     {modelTags}
