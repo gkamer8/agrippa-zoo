@@ -31,10 +31,10 @@ export function Button({className, ...props}){
     );
 }
 
-export function Checkmark({className, label, ...props}){
+export function Checkmark({className, label, startChecked, ...props}){
 
-    const [checked, setChecked] = useState(false);
-
+    const [checked, setChecked] = useState(startChecked);
+    let startColor = startChecked ? "#55b13e" : "#1f1f1f";
     function canonClick(){
         if (checked){
             document.getElementsByClassName('check-button')[0].style.color = "#1f1f1f";
@@ -50,7 +50,7 @@ export function Checkmark({className, label, ...props}){
     className = className ? `check-option ${className}` : 'check-option';
     return (
         <div className={className}>
-            <div className='check-button' onClick={canonClick}>✓</div>
+            <div className='check-button' style={{'color': startColor}} onClick={canonClick}>✓</div>
             <span className='check-label' onClick={canonClick}>{label}</span>
         </div>
     )

@@ -117,12 +117,8 @@ def edit(username):
         tags = model_info['tags']
     if not short_desc:
         short_desc = model_info['short_desc']
-    if not canonical:
+    if canonical is None:
         canonical = model_info['canonical']
-        try:
-            canonical = canonical == 'true'
-        except ValueError:
-            return json.dumps({'response': 'failed', 'why': 'canonical_invalid_type'})
     args = (model_name, author_name, tags, short_desc, canonical, model_id)
 
     db.execute("UPDATE models SET name=?, author_name=?, tags=?, short_desc=?, canonical=? WHERE id=?", args)

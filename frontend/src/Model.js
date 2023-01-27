@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import './Model.css';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
-import { FileUpload, TextInput, Button } from './Form.js';
+import { FileUpload, TextInput, Button, Checkmark } from './Form.js';
 
 // Takes props username and isLoggedIn
 function Model(props){
@@ -604,6 +604,56 @@ function Model(props){
                         {submitTagsStatusComponent}
                     </div>
                 </React.Fragment>
+            )
+
+            // Change canonical
+
+            async function canonChange(){
+                let newModelInfo = {...modelInfo};
+                if (modelInfo['canonical'] === 1){
+                    newModelInfo['canonical'] = 0;
+                }
+                else {
+                    newModelInfo['canonical'] = 1;
+                }
+
+                let fileData = new FormData();
+
+                fileData.append('id', id);
+                let newCanon = newModelInfo['canonical'];
+                fileData.append('canonical', newCanon);
+
+                let url = BACKEND_URL + "update/edit"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                            headers: {
+                                'x-access-token': localStorage.getItem("auth_token"),
+                            },
+                            body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+                
+                    if (myJson.response === 'failed'){
+                        // Is there a better way, really?
+                        alert("Failed to change canonical attribute")
+                    }
+                    else {
+                        setModelInfo(newModelInfo);
+
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    alert("Failed to change canonical attribute")
+                }
+            }
+
+            let startChecked = modelInfo['canonical']
+            canon = (
+                <div className='form-row'>
+                    <Checkmark label="Canonical" startChecked={startChecked} onClick={canonChange} />
+                </div>
             )
 
             // This should be at bottom of this whole thing
