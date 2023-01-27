@@ -266,6 +266,9 @@ function Upload(props) {
                 <div className='form-row'>
                     <Checkmark label="Canonical" onClick={canonChange} />
                 </div>
+                <div className='form-row'>
+                    Upload a zip file of your project if sourced files are inside folders.
+                </div>
                 <div id="files">
                     <div className='form-row'>
                         <FileUpload id="file-selector" onChange={handleFileChange} />
@@ -273,6 +276,9 @@ function Upload(props) {
                 </div>
                 <div className='form-row'>
                     <TextInput id="file-index" placeholder="Index File (main filename)" />
+                </div>
+                <div className='form-row'>
+                    If uploading a zipped file like "folder.zip" that produces "folder" on extraction with "main.agr" inside, you should not refer to the index file as simply "main.agr" rather than "folder/main.agr".
                 </div>
                 <div className='form-row'>
                     <Button value="Submit" onClick={onSubmit} />

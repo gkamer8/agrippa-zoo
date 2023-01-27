@@ -41,7 +41,7 @@ def upload(current_user):
         return json.dumps({'response': 'failed', 'why': 'missing_short_desc'})
     elif not tags:
         return json.dumps({'response': 'failed', 'why': 'missing_tags'})
-    elif not canonical:
+    elif canonical is None:
         return json.dumps({'response': 'failed', 'why': 'missing_canonical'})
     elif not file_index:
         return json.dumps({'response': 'failed', 'why': 'missing_file_index'})
@@ -77,8 +77,7 @@ def upload(current_user):
         new_name = saved_new_name + str(i)
         i += 1
 
-    
-    upload_files_to_s3(request.files, new_name, session)
+    upload_files_to_s3(request.files, new_name, session)  # this should correctly deal with zip files
 
     sql = """
     INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)

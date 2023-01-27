@@ -6,6 +6,9 @@ from flask_cors import cross_origin
 from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
 from .auth import token_required
 import json
+import io
+import zipfile
+
 
 """
 
@@ -22,9 +25,26 @@ BUCKET_NAME = 'agrippa-files'
 def upload_files_to_s3(files, folder_name, session):
     res = session.resource('s3')
     for file in files:
-        file_bytes = request.files[file].read()
-        object = res.Object(BUCKET_NAME, f'{folder_name}/{request.files[file].filename}')
-        object.put(Body=file_bytes)
+        file_bytes = files[file].read()
+        filename = files[file].filename
+        
+        # Is it a zip file?
+        if (filename.split(".")[-1] == 'zip'):
+            with io.BytesIO(file_bytes) as zip_file:
+                with zipfile.ZipFile(zip_file, 'r') as z:
+                    # Print the names of the files in the zip file
+                    namelist = z.namelist()
+                    # Remove folder name
+                    new_names = [x[x.index("/")+1:] for x in namelist]
+                    # Extract all files
+                    for new_fname, old_fname in zip(new_names, namelist):
+                        if new_fname:
+                            fbytes = z.read(old_fname)
+                            object = res.Object(BUCKET_NAME, f'{folder_name}/{new_fname}')
+                            object.put(Body=fbytes)
+        else:
+            object = res.Object(BUCKET_NAME, f'{folder_name}/{filename}')
+            object.put(Body=file_bytes)
 
 
 def get_s3_session():
