@@ -333,11 +333,26 @@ function Flow(props) {
 
         let attrArr = []
         let attrs = node.el.attributes;
-        for (var i=0; i<attrs.length; i++) {
-            var attrib = attrs[i];
+        for (let i=0; i<attrs.length; i++) {
+            let attrib = attrs[i];
             // use attrib.name and attrib.value to get key value pairs
             attrArr.push([attrib.name, attrib.value, i]);
         }
+
+        // For nodes, add their inputs/outputs/parameters
+        // note that we don't need to check, since only nodes have those things as first children
+        for (let i = 0; i < node.el.children.length; i++){
+            if (node.el.children[i].nodeName === 'input'){
+                attrArr.push(['input', node.el.children[i].attributes['src'].value, attrArr.length])
+            }
+            else if (node.el.children[i].nodeName === 'output'){
+                attrArr.push(['output', node.el.children[i].attributes['name'].value, attrArr.length])
+            }
+            else if (node.el.children[i].nodeName === 'params'){
+                attrArr.push(['params', node.el.children[i].attributes['name'].value, attrArr.length])
+            }
+        }
+
         let attrMap = attrArr.map(makeAttrRow);
         let newDetails = (
             <div id="detail-attrs">
