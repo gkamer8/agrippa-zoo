@@ -107,3 +107,10 @@ def register():
             return json.dumps({'response': 'succeeded'})
 
     return error
+
+
+@bp.route('/check', methods=['POST', 'GET'])
+@cross_origin()
+@token_required
+def check_login():
+    return json.dumps({'response': 'succeeded'})

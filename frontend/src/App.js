@@ -6,6 +6,7 @@ import Footer from './Footer';
 import Upload from './Upload';
 import Login from './Login';
 import Workspace from './Workspace';
+import { BACKEND_URL } from './Api.js'
 import Home from './Home';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -48,9 +49,32 @@ function App() {
     function setLogin(){
         let trueLogin = getLoggedIn();
         if (trueLogin){
-            let username = localStorage['username'];
-            setUsername(username);
-            setIsLoggedIn(true);
+
+            // make sure our token's still valid
+            async function getIsLoggedIn() {
+                try {
+                    let url = BACKEND_URL + "auth/check";
+                    const response = await fetch(url, {
+                        method: 'GET',  // endpoint should accept either
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        }
+                     });
+                    const myJson = await response.json(); //extract JSON from the http response
+                    if (myJson.response === 'succeeded'){
+                        let username = localStorage['username'];
+                        setUsername(username);
+                        setIsLoggedIn(true);
+                    }
+                    else {
+                        setIsLoggedIn(false);
+                    }
+                }
+                catch {
+                    setIsLoggedIn(false);
+                }
+            }
+            getIsLoggedIn();
         }
         else {
             setIsLoggedIn(false);

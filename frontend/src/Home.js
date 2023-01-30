@@ -45,7 +45,6 @@ function Home(props){
                     Agrippa makes understanding, building, and combining AI models easier.
                 </h1>
                 The <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">Agrippa Python package</span></a> allows you to define a machine learning architecture using a markup language, which can then be compiled into ONNX, a general format for neural networks.
-                By combining everything that's relevant about a model's architecture into a markup, the model becomes more portable and explicit — all of the important details, like weight initialization, weight sharing, and more are plainly available. <br/> <br/>
                 Below you can see a preview of how a Transformer looks in our model visualization tool. <br/><br/>
                 You can click on a block to see its attributes or double click to see what's inside. <br/><br/>
             </div>
@@ -54,6 +53,7 @@ function Home(props){
             </div>
             <br/>
             <div>
+                By combining everything that's relevant about a model's architecture into a markup, the model becomes more portable and explicit — all of the important details, like weight initialization, weight sharing, and more are plainly available. <br/> <br/>
                 These models can be imported into PyTorch for training or deployed directly as ONNX files for inference. <br/> <br/>
                 Parameters in every model are explicit and named so that you can easily extract them from the model, freeze them, or share them. <br/><br/>
                 In the online workspace, you can visualize the markup you've created and share that markup with others, which they can import into their projects. <br/><br/>
