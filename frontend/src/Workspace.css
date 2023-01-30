@@ -1,43 +1,4 @@
-@import './style.css';
-
 #workspace-container {
     margin-left: var(--def-margin);
     margin-right: var(--def-margin);
-}
-
-.flow-container {
-    height: 100%;
-    width: 100%;
-    margin: auto;
-}
-
-#editor-and-options {
-    display: flex;
-    height: 50em;
-    resize: both;
-    overflow: auto;
-}
-
-#model-info{
-    text-align: left;
-    background-color: var(--impressed);
-    padding: .5em;
-
-    display: flex;
-}
-
-.model-link {
-    text-decoration: underline;
-}
-
-.file-link {
-    margin-left: 1em;
-    cursor: pointer;
-    color: var(--accent);
-
-    display: inline-block;
-}
-
-.file-link-chosen {
-    text-decoration: underline;
 }

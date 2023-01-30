@@ -3,7 +3,7 @@
 #menu{
     text-align: left;
     padding: 1em;
-    width: 20%;
+    min-width: 20%;
 }
 
 .import-node {

@@ -66,7 +66,8 @@ function Flow(props) {
                 }
 
                 if (isSourcedBlock(el)){
-                    return { id: id, className: "sourced-node", position: { x: 0, y: 0 }, data: { label: attrs['name'].value }, el: el }
+                    let title = attrs['title'] ? attrs['title'].value : attrs['name'].value
+                    return { id: id, className: "sourced-node", position: { x: 0, y: 0 }, data: { label: title }, el: el }
                 }
     
                 let title = el.nodeName === 'block' ? `Untitled ${el.nodeName}` : attrs['op'].value;
@@ -280,6 +281,7 @@ function Flow(props) {
                 let labLen = lab.length;
                 console.log(labLen)
                 let newWidth = 20 + labLen * 7.15;  // 20 for the padding
+                newWidth = 150 > newWidth ? 150 : newWidth; 
                 g.setNode(nodes[i].id, {width: newWidth, height: 50});
             }
     
@@ -294,6 +296,7 @@ function Flow(props) {
                 let newNode = Object.assign({}, nodes[i]);
                 newNode.position.x = g.node(newNode.id).x - g.node(newNode.id).width / 2;
                 newNode.position.y = g.node(newNode.id).y;
+                newNode.style = {'width': g.node(newNode.id).width}
                 arrangedNodes.push(newNode);
             }
             return arrangedNodes;
@@ -398,6 +401,17 @@ function Flow(props) {
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
     
+    let detailsMenu = "";
+    if (details){
+        detailsMenu = (
+            <div id='menu'>
+                <h2>
+                    Details
+                </h2>
+                {details}
+            </div>
+        )
+    }
 
     return (
         <div style={{ width:'100%', height: '100%', display: 'flex'}}>
@@ -417,12 +431,7 @@ function Flow(props) {
                     {focusedNodeControl}
                 </Panel>
             </ReactFlow>
-            <div id='menu'>
-                <h2>
-                    Details
-                </h2>
-                {details}
-            </div>
+            {detailsMenu}
         </div>
     );
 }

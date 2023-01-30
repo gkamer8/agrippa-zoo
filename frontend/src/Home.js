@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ModelTable from './ModelTable';
 import { useState, useEffect } from 'react';
 import { BACKEND_URL } from './Api.js'
+import ModelViewer from './ModelViewer'
 
 
 function Home(props){
@@ -39,9 +40,28 @@ function Home(props){
 
     let message = (
         <div>
-            Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or
-            if you'd like to upload models to the zoo, try <Link to="/register" ><span className='link'>registering</span></Link> for an account and/or <Link className="link" to="/login" ><span className="link">logging in</span></Link>.
+            <div>
+                <h1>
+                    Agrippa makes understanding, building, and combining AI models easier.
+                </h1>
+                The <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">Agrippa Python package</span></a> allows you to define a machine learning architecture using a markup language, which can then be compiled into ONNX, a general format for neural networks. <br/> <br/>
+                Below you can see how a Transformer looks in our model visualization tool. <br/><br/>
+                You can click on a block to see its attributes or double click to see what's inside. <br/><br/>
+            </div>
+            <div style={{'width': 'min(50em, 100%)'}}>
+                <ModelViewer model_id="5" height="40vh" />
+                A Transformer, uploaded to Agrippa.
+            </div>
+            <br/>
+            <div>
+                These models can be imported into PyTorch for training, or deployed for inference. <br/> <br/>
+                Parameters in every model are explicit and named so that you can easily extract them from the model, freeze them, or share them. <br/><br/>
+                In the online workspace, you can visualize the markup you've created and share that markup with others, which they can import into their projects. <br/><br/>
+                The Agrippa Python package is available <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">here</span></a> on GitHub. Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or
+                if you'd like to upload models to the zoo, try <Link to="/register" ><span className='link'>registering</span></Link> for an account and/or <Link className="link" to="/login" ><span className="link">logging in</span></Link>.        
+            </div>
         </div>
+
     );
 
     if (props.isLoggedIn){
@@ -72,6 +92,7 @@ function Home(props){
         }
         message = (
             <div>
+                <h1>Welcome</h1>
                 Hello, {props.username}. <br/><br/>
                 Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or try <Link to="/upload" ><span className='link'>uploading</span></Link> a model.
                 {modelTable}
@@ -81,7 +102,6 @@ function Home(props){
 
     return (
         <div id="home-container">
-            <h1>Welcome</h1>
             {message}
         </div>
     )

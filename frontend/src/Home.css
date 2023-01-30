@@ -9,3 +9,7 @@
 .link {
     text-decoration: underline;
 }
+
+.emphasis {
+    color: var(--accent);
+}
