@@ -14,6 +14,8 @@
 #editor-and-options {
     display: flex;
     height: 50em;
+    resize: both;
+    overflow: auto;
 }
 
 #model-info{
