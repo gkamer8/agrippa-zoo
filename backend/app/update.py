@@ -89,7 +89,7 @@ def delete(username):
 """
 
 This route is for deleting one (1) file from s3
-Takes 'id' and 'path'
+Takes 'id' and 'path' (path is from inside the model's folder)
 
 """
 @bp.route('/delete/file', methods=['POST'])
