@@ -22,6 +22,7 @@ function Flow(props) {
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
     const [details, setDetails] = useState(undefined);
     const [modelDoc, setModelDoc] = useState(undefined);
+    const [detailsClosed, setDetailsClosed] = useState(true);
 
     const fileText = props.fileText;
     // const id = props.id;
@@ -363,6 +364,7 @@ function Flow(props) {
             </div>
         );
         setDetails(newDetails);
+        setDetailsClosed(false);
     }
 
     function goToParent(){
@@ -387,6 +389,7 @@ function Flow(props) {
 
     function onNodeDoubleClick(event, node){
         let el = node.el;
+        setDetailsClosed(true);
         if (el.nodeName === 'block' && el.attributes['src']){
             props.onSourcedClick(el.attributes['src'].value);
             return;
@@ -401,10 +404,15 @@ function Flow(props) {
 
     const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
     
+    function closeDetails(){
+        setDetailsClosed(true);
+    }
+
     let detailsMenu = "";
-    if (details){
+    if (!detailsClosed){
         detailsMenu = (
             <div id='menu'>
+                <span onClick={closeDetails} className="details-close-button">Close</span>
                 <h2>
                     Details
                 </h2>

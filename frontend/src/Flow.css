@@ -59,3 +59,10 @@
     text-decoration: underline;
     cursor: pointer;
 }
+
+.details-close-button {
+    text-decoration: underline;
+    font-size: .75em;
+    cursor: pointer;
+    float: right;
+}
