@@ -12,7 +12,8 @@ CREATE TABLE models (
     tags TEXT,  /* A dictionary of tags like {"input": ["text", "tokens"], "output": ["distribution"], ...} */
     s3_storage_path TEXT,  /* assuming we know bucket is agrippa-files */
     username TEXT,
-    file_index TEXT  /* The index .agr file */
+    file_index TEXT,  /* The index .agr file */
+    time_uploaded DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 DROP TABLE IF EXISTS users;

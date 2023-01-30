@@ -57,7 +57,7 @@ def upload(current_user):
     s3 = session.client('s3')
     result = s3.list_objects_v2(Bucket=BUCKET_NAME)
     # Get a list of all the directories in the bucket
-    directories = [item['Key'] for item in result.get('Contents', []) if item['Size'] == 0]
+    directories = set([item['Key'].split("/")[0] for item in result.get('Contents', [])])
     # Get a unique folder name
     new_name = ""
     allowed_alphabet = 'abcdefghizjlmnopqrstuvwxyz'
@@ -73,6 +73,8 @@ def upload(current_user):
     
     i = 0
     saved_new_name = new_name + ""
+    print(saved_new_name)
+    print(directories)
     while new_name in directories:
         new_name = saved_new_name + str(i)
         i += 1

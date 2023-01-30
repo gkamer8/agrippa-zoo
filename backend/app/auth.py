@@ -112,5 +112,5 @@ def register():
 @bp.route('/check', methods=['POST', 'GET'])
 @cross_origin()
 @token_required
-def check_login():
+def check_login(username):
     return json.dumps({'response': 'succeeded'})

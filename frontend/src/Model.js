@@ -77,9 +77,12 @@ function Model(props){
 
             let inputTags = JSON.parse(modelInfo['tags'])['input']
             let outputTags = JSON.parse(modelInfo['tags'])['output']
-            
-            setInputTags(inputTags);
-            setOutputTags(outputTags);
+            if (inputTags){
+                setInputTags(inputTags);
+            }
+            if (outputTags) {
+                setOutputTags(outputTags);
+            }
         }
     }, [isEditMode, modelInfo, setInputTags, setOutputTags]);
 
