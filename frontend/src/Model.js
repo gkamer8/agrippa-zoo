@@ -36,7 +36,7 @@ function Model(props){
 
         async function getModel(){
             console.log("Getting jawn")
-            let url = BACKEND_URL + "info/model?id=" + id;
+            let url = BACKEND_URL + "info/model?id=" + id + "&file_manifest=1";
             try {
                 const response = await fetch(url);
                 const myJson = await response.json(); //extract JSON from the http response
@@ -73,6 +73,7 @@ function Model(props){
         if (isEditMode){
             document.getElementById("model-name-text-box").value = modelInfo['name'];
             document.getElementById("model-author-text-box").value = modelInfo['author_name'];
+            document.getElementById("index-file-text-box").value = modelInfo['file_index'];
 
             let inputTags = JSON.parse(modelInfo['tags'])['input']
             let outputTags = JSON.parse(modelInfo['tags'])['output']
@@ -171,7 +172,7 @@ function Model(props){
             if (modelInfo.username === props.username){
                 ownerOptions = (
                     <div className='owner-options'>
-                        You own this model. <span onClick={reveal} style={{'text-decoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
+                        You own this model. <span onClick={reveal} style={{'textDecoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
                     </div>
                 );
             }
@@ -235,7 +236,7 @@ function Model(props){
                 <div id='model-name-comp'>
                     <div id='editable-model-name'>
                         <TextInput id='model-name-text-box' className='model_name editable-model-name' />
-                        <div onClick={submitModelName} style={{'margin-bottom': '1em', 'text-decoration': 'underline', 'cursor': 'pointer', 'display': 'inline-block'}}>Submit Name Change</div>
+                        <div onClick={submitModelName} style={{'marginBottom': '1em', 'textDecoration': 'underline', 'cursor': 'pointer', 'display': 'inline-block'}}>Submit Name Change</div>
                         {modelNameStatusComponent}
                     </div>
                 </div>
@@ -348,11 +349,59 @@ function Model(props){
                 submitFilesResponse = <div><br/>Failed to upload files.</div>
             }
 
+            async function deleteFile(index){
+                let fileData = new FormData();
+                fileData.append('id', id);
+                fileData.append('path', modelInfo['file_paths'][index])
+                let url = BACKEND_URL + "update/delete/file"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-access-token': localStorage.getItem("auth_token"),
+                        },
+                        body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+        
+                    console.log(myJson);
+        
+                    if (myJson.response === 'failed'){
+                        alert("Could not delete file: " + myJson.why)
+                    }
+                    else {
+                        let newModelInfo = {...modelInfo}
+                        newModelInfo['file_paths'] = [];
+                        for (let i = 0; i < modelInfo['file_paths'].length; i++){
+                            if (i != index){
+                                newModelInfo['file_paths'].push(modelInfo['file_paths'][i])
+                            }
+                        }
+                        setModelInfo(newModelInfo);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                }
+            }
+
+            function makeExistingFile(index){
+                return (
+                    <div className='file-box' key={index}>
+                        {modelInfo['file_paths'][index]} <span onClick={() => deleteFile(index)} className='file-delete'>X</span>
+                    </div>
+                )
+            }
+
+            let existingFiles = Array.from({length: modelInfo['file_paths'].length}, (_, i) => i).map(makeExistingFile)
             let fileUpload = (
                 <div>
                     <FileUpload onChange={handleFileChange} buttonClassName='upload-button' />
                     <span onClick={submitFiles} className='delete-option'>Submit Files</span>
                     {submitFilesResponse}
+                    <div style={{'marginTop': '1em'}}>
+                        {existingFiles}
+                    </div>
                 </div>
             )
 
@@ -396,23 +445,23 @@ function Model(props){
             let modelAuthorStatusComponent = "";
             if (submitAuthorNameStatus === 1){
                 modelAuthorStatusComponent = (
-                    <span style={{'margin-left': '.5em'}}>Submitting...</span>
+                    <span style={{'marginLeft': '.5em'}}>Submitting...</span>
                 )
             }
             else if (submitAuthorNameStatus === 2){
                 modelAuthorStatusComponent = (
-                    <span style={{'margin-left': '.5em'}}>Submitted successfully.</span>
+                    <span style={{'marginLeft': '.5em'}}>Submitted successfully.</span>
                 )
             }
             else if (submitAuthorNameStatus === 3){
                 modelAuthorStatusComponent = (
-                    <span style={{'margin-left': '.5em'}}>Failed.</span>
+                    <span style={{'marginLeft': '.5em'}}>Failed.</span>
                 )
             }
 
             modelAuthorComponent = (
                 <div style={{'display': 'inline-block'}}>
-                    <div style={{'display': 'inline-block', 'margin-right': '.5em'}}>
+                    <div style={{'display': 'inline-block', 'marginRight': '.5em'}}>
                         <TextInput id='model-author-text-box' />
                     </div>
                     <span onClick={submitAuthorName} className='delete-option'>Submit</span>
@@ -558,7 +607,6 @@ function Model(props){
                     console.error(error);
                     setSubmitTagsStatus(3);
                 }
-
             }
 
             const inputTagLabels = [...Array(inputTags.length).keys()].map(makeInputTag);
@@ -656,15 +704,65 @@ function Model(props){
                 </div>
             )
 
+            // Update the index file
+            async function submitIndexFile(){
+                let newModelInfo = {...modelInfo};
+                newModelInfo['file_index'] = document.getElementById("index-file-text-box").value;
+
+                let fileData = new FormData();
+
+                fileData.append('id', id);
+                fileData.append('file_index', newModelInfo['file_index']);
+
+                let url = BACKEND_URL + "update/edit"
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                            headers: {
+                                'x-access-token': localStorage.getItem("auth_token"),
+                            },
+                            body: fileData
+                        });
+                    const myJson = await response.json(); //extract JSON from the http response
+                
+                    if (myJson.response === 'failed'){
+                        // Is there a better way, really?
+                        alert("Failed to change index file")
+                        console.log(myJson)
+                    }
+                    else {
+                        setModelInfo(newModelInfo);
+                    }
+                } 
+                catch (error) {
+                    console.error(error);
+                    alert("Failed to change index file")
+                }
+            }
+
+            let changeIndex = (
+                <div>
+                    <TextInput id="index-file-text-box" />
+                    <div style={{'marginTop': '1em', 'textDecoration': 'underline', 'cursor': 'pointer'}}>
+                        <span onClick={submitIndexFile}>
+                            Submit New Index File
+                        </span>
+                    </div>
+                </div>
+            )
+
             // This should be at bottom of this whole thing
             ownerOptions = (
                 <div className='owner-options'>
-                    You own this model. <span onClick={reveal} style={{'text-decoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
-                    <div style={{'margin-top': '1em'}}>
+                    You own this model. <span onClick={reveal} style={{'textDecoration': 'underline', 'cursor': 'pointer'}}>Edit</span>
+                    <div style={{'marginTop': '1em'}}>
                         {deleteOptions}
                     </div>
-                    <div style={{'margin-top': '1em'}}>
+                    <div style={{'marginTop': '1em'}}>
                         {fileUpload}
+                    </div>
+                    <div style={{'marginTop': '1em'}}>
+                        {changeIndex}
                     </div>
                 </div>
             )

@@ -87,3 +87,23 @@ body {
 .model-name-status-text {
     margin-bottom: 1em;
 }
+
+#index-file-text-box {
+    background-color: var(--bg);
+    width: min(calc(100% - var(--def-margin) * 2), )
+}
+
+.file-box {
+    color: var(--accent);
+    margin-bottom: 1em;
+}
+
+.file-delete {
+    background-color: var(--bg);
+    color: var(--accent);
+    padding: .25em;
+    padding-right: .5em;
+    padding-left: .5em;
+    font-size: .75em;
+    cursor: pointer;
+}

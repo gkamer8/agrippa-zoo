@@ -86,6 +86,46 @@ def delete(username):
     return json.dumps({'response': 'succeeded'})
 
 
+"""
+
+This route is for deleting one (1) file from s3
+Takes 'id' and 'path'
+
+"""
+@bp.route('/delete/file', methods=['POST'])
+@cross_origin()
+@token_required
+def delete_file(username):
+    model_id = request.form.get('id')
+    if not model_id:
+        return "For he himself has said it"
+    
+    db = get_db()
+    model_info = db.execute(
+        "SELECT id, username, s3_storage_path, file_index FROM models WHERE id=?", (model_id,)
+    ).fetchone()
+
+    if username != model_info['username']:
+        return "And it's greatly to his credit"
+
+    file_to_delete = request.form.get('path')
+    if not file_to_delete:
+        return "That he is an Englishman"
+    elif file_to_delete == model_info['file_index']:
+        return json.dumps({'response': 'failed', 'why': 'cannot_remove_index_file'})
+
+    # Straight up chatGPT
+    # AWS buckets supposedly have no concept of folders, so we're deleting everything in the folder instead
+    try:
+        s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+        objects_to_delete = [{'Key': model_info['s3_storage_path'] + "/" + file_to_delete}]
+        s3.delete_objects(Bucket=BUCKET_NAME, Delete={'Objects': objects_to_delete})
+    except:
+        return json.dumps({'response': 'failed', 'why': 'error_removing_files_from_storage'})
+
+    return json.dumps({'response': 'succeeded'})
+
+
 @bp.route('/upload', methods=['POST'])
 @cross_origin()
 @token_required
@@ -117,7 +157,7 @@ def edit(username):
     
     db = get_db()
     model_info = db.execute(
-        "SELECT id, username, name, author_name, tags, short_desc, canonical FROM models WHERE id=?", (model_id,)
+        "SELECT * FROM models WHERE id=?", (model_id,)
     ).fetchone()
 
     if username != model_info['username']:
@@ -129,6 +169,8 @@ def edit(username):
     short_desc = request.form.get('short_desc')
     canonical = request.form.get('canonical')
     short_desc = request.form.get('short_desc')
+    file_index = request.form.get('file_index')
+
     if not model_name:
         model_name = model_info['name']
     if not author_name:
@@ -139,9 +181,12 @@ def edit(username):
         short_desc = model_info['short_desc']
     if canonical is None:
         canonical = model_info['canonical']
-    args = (model_name, author_name, tags, short_desc, canonical, model_id)
+    if not file_index:
+        file_index = model_info['file_index']
 
-    db.execute("UPDATE models SET name=?, author_name=?, tags=?, short_desc=?, canonical=? WHERE id=?", args)
+    args = (model_name, author_name, tags, short_desc, canonical, file_index, model_id)
+
+    db.execute("UPDATE models SET name=?, author_name=?, tags=?, short_desc=?, canonical=?, file_index=? WHERE id=?", args)
     db.commit()
 
     return json.dumps({'response': 'succeeded'})
