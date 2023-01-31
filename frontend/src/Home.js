@@ -39,12 +39,16 @@ function Home(props){
     }, [modelsLoaded, props.isLoggedIn, props.username]);
 
     let message = (
-        <div>
+        <div style={{'width': 'min(100%, 50em)'}}>
             <div>
+                <h3>
+                    About
+                </h3>
                 <h1>
-                    Agrippa makes understanding, building, and combining AI models easier.
+                    Easily understand, combine, and build AI models.
                 </h1>
-                The <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">Agrippa Python package</span></a> allows you to define a machine learning architecture using a markup language, which can then be compiled into ONNX, a general format for neural networks.
+                <br/>
+                The <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">Agrippa Python package</span></a> allows you to define a machine learning architecture using a markup language, which can then be compiled into other frameworks, like PyTorch.
                 Below you can see a preview of how a Transformer looks in our model visualization tool. <br/><br/>
                 You can click on a block to see its attributes or double click to see what's inside. <br/><br/>
             </div>
@@ -53,11 +57,27 @@ function Home(props){
             </div>
             <br/>
             <div>
+                <h3>
+                    Python Package
+                </h3>
+                <h1>
+                    A Markup for ML Architectures
+                </h1>
+                <br/>
                 By combining everything that's relevant about a model's architecture into a markup, the model becomes more portable and explicit — all of the important details, like weight initialization, weight sharing, and more are plainly available. <br/> <br/>
-                These models can be imported into PyTorch for training or deployed directly as ONNX files for inference. <br/> <br/>
+                These models are first exported into the ONNX format, a general specification for neural networks that can be deployed efficiently. The package contains a utility to import the ONNX into PyTorch for training. <br/> <br/>
                 Parameters in every model are explicit and named so that you can easily extract them from the model, freeze them, or share them. <br/><br/>
+                The Agrippa Python package is available <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">here</span></a> on GitHub.
+                <br/><br/>
+                <h3>
+                    Online Workspace
+                </h3>
+                <h1>
+                    Visualize Complex Architectures
+                </h1>
+                <br/>
                 In the online workspace, you can visualize the markup you've created and share that markup with others, which they can import into their projects. <br/><br/>
-                The Agrippa Python package is available <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">here</span></a> on GitHub. Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or
+                Check out the <Link to="/zoo" ><span className='link'>Model Zoo</span></Link>, or
                 if you'd like to upload models to the zoo, try <Link to="/register" ><span className='link'>registering</span></Link> for an account and/or <Link className="link" to="/login" ><span className="link">logging in</span></Link>.        
             </div>
         </div>
