@@ -5,6 +5,7 @@
     --font: 'Ubuntu';
     --def-margin: 2em;
     --impressed: #1f1f1f;
+    --soft-text: #cccccc;
 }
 
 @font-face {

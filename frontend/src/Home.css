@@ -13,3 +13,8 @@
 .emphasis {
     color: var(--accent);
 }
+
+.p-text {
+    color: var(--soft-text);
+    line-height: 1.8
+}
