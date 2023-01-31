@@ -4,6 +4,7 @@ import ModelTable from './ModelTable';
 import { useState, useEffect } from 'react';
 import { BACKEND_URL } from './Api.js'
 import ModelViewer from './ModelViewer'
+import { Button } from "./Form";
 
 
 function Home(props){
@@ -39,7 +40,7 @@ function Home(props){
     }, [modelsLoaded, props.isLoggedIn, props.username]);
 
     let message = (
-        <div style={{'width': 'min(100%, 50em)'}}>
+        <div style={{'width': 'min(100%, 55em)'}}>
             <div>
                 <h3>
                     About
@@ -50,11 +51,16 @@ function Home(props){
                 <p className="p-text">
                     <br/>
                     The <a href="https://github.com/gkamer8/agrippa-pkg"><span className="link">Agrippa Python package</span></a> allows you to define a machine learning architecture using a markup language, which can then be compiled into other frameworks, like PyTorch.
-                    Below you can see a preview of how a Transformer looks in our model visualization tool. <br/><br/>
-                    You can click on a block to see its attributes or double click to see what's inside. <br/><br/>
+                    This website lets you share and visualize your models. Check out the <Link to="/zoo"><span className="link">Zoo</span></Link> to see what others have built, or check out our Getting Started page for information on how to begin using Agrippa.
+                    <br/><br/>
+                    <Link to="/Docs/getting-started">
+                        <Button value="Get Started" />
+                    </Link>
+                    <br/><br/>
+                    Below you can see a preview of how a Transformer looks in our model visualization tool. You can click on a block to see its attributes or double click to see what's inside. <br/><br/>
                 </p>
             </div>
-            <div style={{'width': 'min(50em, 100%)'}}>
+            <div style={{'width': 'min(55em, 100%)'}}>
                 <ModelViewer model_id="5" height="40vh" />
             </div>
             <br/>

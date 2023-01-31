@@ -2,8 +2,9 @@
 
 #home-container{
     text-align: left;
-    margin-left: var(--def-margin);
-    margin-right: var(--def-margin);
+    margin-left: 4em;
+    margin-right: 4em;
+    margin-top: 4em;
 }
 
 .link {
