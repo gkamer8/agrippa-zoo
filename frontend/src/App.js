@@ -8,6 +8,7 @@ import Login from './Login';
 import Workspace from './Workspace';
 import { BACKEND_URL } from './Api.js'
 import Home from './Home';
+import Docs from './Docs/Docs';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -112,6 +113,9 @@ function App() {
                     } />
                     <Route path="/workspace/:id" element={
                         <Workspace />
+                    } />
+                    <Route path="/docs/:section?/:subsection?/:subsubsection?" element={
+                        <Docs />
                     } />
                     <Route path="*" element = {
                         <div>NOT FOUND</div>

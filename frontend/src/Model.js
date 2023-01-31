@@ -376,7 +376,7 @@ function Model(props){
                         let newModelInfo = {...modelInfo}
                         newModelInfo['file_paths'] = [];
                         for (let i = 0; i < modelInfo['file_paths'].length; i++){
-                            if (i != index){
+                            if (i !== index){
                                 newModelInfo['file_paths'].push(modelInfo['file_paths'][i])
                             }
                         }

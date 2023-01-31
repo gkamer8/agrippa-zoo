@@ -89,7 +89,7 @@ function SearchableTable(props) {
 
     const listItems = models.map(makeSquare);
     return (
-        <div>
+        <div className="model-table-container">
             <div className={'search-bar'}>
                 <TextInput onChange={handleSearchTextChange} placeholder="Search..." />
             </div>

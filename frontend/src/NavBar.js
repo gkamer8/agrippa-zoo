@@ -39,6 +39,9 @@ function NavBar(props){
                 <Link to="/zoo">
                     <span className='little-text'>Zoo</span>
                 </Link>
+                <Link to="/docs">
+                    <span className='little-text'>Docs</span>
+                </Link>
                 {loginSensitive}
             </div>
         </div>

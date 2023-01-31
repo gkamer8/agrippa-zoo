@@ -26,3 +26,7 @@ th {
     margin-bottom: .5em;
     width: min(100%, 25em);
 }
+
+.model-table-container {
+    margin-top: var(--def-margin);
+}

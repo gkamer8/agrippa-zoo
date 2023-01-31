@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BACKEND_URL } from './Api';
 import Flow from './Flow';
 import { ReactFlowProvider } from 'reactflow';

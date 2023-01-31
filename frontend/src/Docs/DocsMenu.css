@@ -1,0 +1,14 @@
+
+#docs-menu-container {
+    text-align: left;
+    padding: var(--def-margin);
+    background-color: var(--impressed);
+}
+
+.menu-entry {
+    margin: .5em;
+}
+
+.section {
+    margin-left: 1em;
+}

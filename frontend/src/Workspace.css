@@ -1,4 +1,5 @@
 #workspace-container {
     margin-left: var(--def-margin);
     margin-right: var(--def-margin);
+    margin-top: var(--def-margin);
 }
