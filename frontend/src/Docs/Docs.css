@@ -1,0 +1,18 @@
+blockquote {
+    border-left: .5em solid var(--impressed);
+    padding-left: .5em;
+}
+
+pre {
+    background-color: var(--impressed);
+    padding: 1em;
+    line-height: 1.1em;
+}
+
+code {
+    background-color: var(--impressed);
+}
+
+div {
+    line-height: 1.8em;
+}

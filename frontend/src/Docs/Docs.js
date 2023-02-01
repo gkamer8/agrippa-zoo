@@ -4,6 +4,10 @@ import ReactMarkdown from 'react-markdown';
 import { useParams } from 'react-router-dom';
 import { SECTION_MAP } from './DocsConfig'
 import { useState, useEffect } from 'react';
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
+
 
 function Docs(props) {
 
@@ -50,11 +54,14 @@ function Docs(props) {
 
     return (
         <div style={{'display': 'flex'}}>
-            <div>
+            <div style={{'minWidth': '20%'}}>
                 <DocsMenu opened={opened} />
             </div>
-            <div style={{'padding': '2em', 'textAlign': 'left'}}>
-                <ReactMarkdown>
+            <div style={{'width': '80%', 'overflow': 'auto', 'padding': '2em', 'textAlign': 'left'}}>
+                <ReactMarkdown
+                    remarkPlugins={[remarkMath]}
+                    rehypePlugins={[rehypeKatex]}>
+                    
                     {mdText}
                 </ReactMarkdown>
             </div>
