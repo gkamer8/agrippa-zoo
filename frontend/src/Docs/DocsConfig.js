@@ -8,7 +8,16 @@ export const SECTION_MAP = [
                 'add': ['Add', 'node_ops_add.md', {}],
                 'concat': ['Concat', 'node_ops_concat.md', {}],
                 'identity': ['Identity', 'node_ops_identity.md', {}],
-                'leaky-relu': ['Leaky Relu', 'node_ops_leaky_relu.md', {}]
+                'leaky-relu': ['Leaky Relu', 'node_ops_leaky_relu.md', {}],
+                'lp-normalization': ['LP Norm', 'node_ops_lp_normalization.md', {}],
+                'matmul': ['MatMul', 'node_ops_matmul.md', {}],
+                'mul': ['Mul', 'node_ops_mul.md', {}],
+                'relu': ['Relu', 'node_ops_relu.md', {}],
+                'reduce-mean': ['Reduce Mean', 'node_ops_reduce_mean.md', {}],
+                'softmax': ['Softmax', 'node_ops_softmax.md', {}],
+                'sqrt': ['Sqrt', 'node_ops_sqrt.md', {}],
+                'sub': ['Sub', 'node_ops_sub.md', {}],
+                'transpose': ['Transpose', 'node_ops_transpose.md', {}]
             }]
         }],
     }
