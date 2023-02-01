@@ -14,6 +14,10 @@ code {
     color: var(--accent)
 }
 
-div {
+.md-container {
+    width: 80%;
+    overflow: auto;
+    padding: 2em;
     line-height: 1.8em;
+    text-align: left;
 }

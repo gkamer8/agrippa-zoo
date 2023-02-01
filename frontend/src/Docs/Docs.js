@@ -14,6 +14,7 @@ function Docs(props) {
     const [mdFilepath, setMdFilepath] = useState("./markdown/main.md");
     const [opened, setOpened] = useState([]);
     const [mdText, setMdText] = useState("");
+    const [final, setFinal] = useState(false);
 
     let { section, subsection, subsubsection } = useParams();
 
@@ -27,18 +28,20 @@ function Docs(props) {
                 setMdText(textContent);
             });
         }
-        getFile();
-    }, [mdFilepath]);
+        if (final){
+            getFile();
+        }
+    }, [mdFilepath, final]);
 
     useEffect(() => {
         let newOpened = []  // list of max length 3: [section id, subsection id, subsubsection id]
 
         if (section){
-            newOpened.push(section)
+            newOpened.push(section);
             if (subsection){
-                newOpened.push(subsection)
+                newOpened.push(subsection);
                 if (subsubsection){
-                    newOpened.push(subsubsection)
+                    newOpened.push(subsubsection);
                 }
             }
         }
@@ -47,17 +50,17 @@ function Docs(props) {
         for (let i = 0; i < newOpened.length; i++){
             openedTriple = openedTriple[2][newOpened[i]]
         }
-        setMdFilepath("./markdown/" + openedTriple[1])
-
-        setOpened(newOpened)
-    }, [setMdFilepath, setOpened, section, subsection, subsubsection])
+        setMdFilepath("./markdown/" + openedTriple[1]);
+        setFinal(true);
+        setOpened(newOpened);
+    }, [setMdFilepath, setOpened, setFinal, section, subsection, subsubsection])
 
     return (
         <div style={{'display': 'flex'}}>
             <div style={{'minWidth': '20%'}}>
                 <DocsMenu opened={opened} />
             </div>
-            <div style={{'width': '80%', 'overflow': 'auto', 'padding': '2em', 'textAlign': 'left'}}>
+            <div className='md-container'>
                 <ReactMarkdown
                     remarkPlugins={[remarkMath]}
                     rehypePlugins={[rehypeKatex]}>
