@@ -11,14 +11,14 @@ Here is how a block performing a linear regression might look:
 ```
 <block title="Linear">
     <node op="Mul" title="Apply Betas">
-        <params name="W" dims="[var(n)]" />
+        <params name="W" dim="[var(n)]" />
         <input src="x" />
         <output name="wx" />
     </node>
     <node op="Add" title="Apply Biases">
-        <params name="b" dims="[1]" />
+        <params name="b" dim="[1]" />
         <input src="wx" />
-        <ouptut name="y" />
+        <output name="y" />
     </node>
 </block>
 ```

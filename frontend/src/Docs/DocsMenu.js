@@ -14,15 +14,6 @@ function DocsMenu(props){
             let id = entry[0]
             let name = entry[1][0]
 
-            function openSubsection(id){
-                if (document.getElementById(id+"-section").style.display === 'block'){
-                    document.getElementById(id+"-section").style.display = 'none';
-                }
-                else{
-                    document.getElementById(id+"-section").style.display = 'block';
-                }
-            }
-
             if (Object.keys(entry[1][2]).length !== 0){
 
                 let newlinks = []
@@ -33,12 +24,17 @@ function DocsMenu(props){
 
                 newlinks = newlinks.map(makeLink);
 
+                let startingDisplay = "none";
+                if (props.opened.includes(id)){
+                    startingDisplay = "block";
+                }
+
                 return (
                     <div>
-                        <div className='menu-entry' onClick={() => {openSubsection(id)}}>
+                        <div className='menu-entry'>
                             <Link to={`${entry[2]}/${id}`}>{name}</Link>
                         </div>
-                        <div className='section' id={id+"-section"} style={{'display': 'none'}}>
+                        <div className='section' id={id+"-section"} style={{'display': startingDisplay}}>
                             {newlinks}
                         </div>
                     </div>
@@ -55,7 +51,6 @@ function DocsMenu(props){
         for (const [key, value] of Object.entries(subsections)) {
             entries.push([key, value, "/Docs"])
         }
-        console.log(entries)
         let links = entries.map(makeLink);
         return (
             <div>

@@ -6,11 +6,12 @@ blockquote {
 pre {
     background-color: var(--impressed);
     padding: 1em;
-    line-height: 1.1em;
+    line-height: 1.25em;
 }
 
 code {
     background-color: var(--impressed);
+    color: var(--accent)
 }
 
 div {
