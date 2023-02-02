@@ -5,7 +5,8 @@ export const SECTION_MAP = [
         'getting-started': ['Getting Started', 'getting_started.md', {
                 'getting-started-1': ['Creating the Model', 'getting_started_1.md', {}],
                 'getting-started-2': ['Training the Model', 'getting_started_2.md', {}],
-                'getting-started-3': ['Inference', 'getting_started_3.md', {}]
+                'getting-started-3': ['Inference', 'getting_started_3.md', {}],
+                'getting-started-4': ['Upload and Visualize', 'getting_started_4.md', {}]
             }],
         'nodes': ['Nodes', 'nodes.md', {
             'node-ops': ['Node Ops', 'node_ops.md', {

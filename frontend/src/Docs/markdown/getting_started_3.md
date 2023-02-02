@@ -22,3 +22,5 @@ print(f"Output: {outputs}")
 ```
 
 Now you should have the basic pipeline for creating, training, and running models in our system. For more details, such as data typing, initializations, frozen parameters, and more, see the rest of the documentation.
+
+If you would like to upload and visualize your model, proceed to the next section in this tutorial.
