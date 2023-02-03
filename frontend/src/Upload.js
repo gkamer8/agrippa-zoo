@@ -275,10 +275,7 @@ function Upload(props) {
                     </div>
                 </div>
                 <div className='form-row'>
-                    <TextInput id="file-index" placeholder="Index File (main filename)" />
-                </div>
-                <div className='form-row'>
-                    If uploading a zipped file like "folder.zip" that produces "folder" on extraction with "main.agr" inside, you should not refer to the index file as simply "main.agr" rather than "folder/main.agr".
+                    <TextInput id="file-index" placeholder="Index File (main filename, e.g. 'main.agr')" />
                 </div>
                 <div className='form-row'>
                     <Button value="Submit" onClick={onSubmit} />

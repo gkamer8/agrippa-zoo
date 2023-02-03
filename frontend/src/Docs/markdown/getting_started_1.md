@@ -2,6 +2,16 @@
 
 First, we must create a project folder for our model, which we'll call `lin-reg`. Inside the project directory, add a file called `main.agr`. This will be the index file (main file) of our project.
 
+Note that you might want to enable XML syntax highlighting for files with a `.agr` extension. In VSCode, you can place the following code inside a `settings.json` file:
+
+```
+"files.associations": {
+    "*.agr": "xml"
+}
+```
+
+The `settings.json` file can be opened using `CTRL-SHIFT-P`, typing `settings.json`, and choosing the appropriate option.
+
 Inside `main.agr`, we can start by creating the root `model` element:
 
 ```
