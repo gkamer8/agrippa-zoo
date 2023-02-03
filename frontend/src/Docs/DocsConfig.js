@@ -8,12 +8,6 @@ export const SECTION_MAP = [
             'getting-started-3': ['Inference', 'getting_started_3.md', {}],
             'getting-started-4': ['Upload and Visualize', 'getting_started_4.md', {}]
         }],
-        'features': ['Advanced Features', 'features.md', {
-            'reps': ['Repeated Blocks', 'features_reps.md', {}],
-            'stretch': ['Stretched Blocks', 'features_stretch.md', {}],
-            'shared-parameters': ['Shared Parameters', 'features_shared_parameters.md', {}],
-            'frozen-parameters': ['Frozen Parameters', 'features_frozen_parameters.md', {}]
-        }],
         'nodes': ['Nodes', 'nodes.md', {
             'node-ops': ['Node Ops', 'node_ops.md', {
                 'add': ['Add', 'node_ops_add.md', {}],
@@ -30,6 +24,17 @@ export const SECTION_MAP = [
                 'sub': ['Sub', 'node_ops_sub.md', {}],
                 'transpose': ['Transpose', 'node_ops_transpose.md', {}]
             }]
+        }],
+        'rules': ['Rules', 'rules.md', {
+            'no-stretch-and-rep': ['No Stretch and Rep', 'rules_no_stretch_and_rep.md', {}],
+            'naming': ['Naming Rules', 'rules_naming.md', {}]
+        }],
+        'features': ['Advanced Features', 'features.md', {
+            'reps': ['Repeated Blocks', 'features_reps.md', {}],
+            'stretch': ['Stretched Blocks', 'features_stretch.md', {}],
+            'shared-parameters': ['Shared Parameters', 'features_shared_parameters.md', {}],
+            'frozen-parameters': ['Frozen Parameters', 'features_frozen_parameters.md', {}],
+            'sourced-blocks': ['Sourced Blocks', 'features_sourced_blocks.md', {}]
         }],
     }
 ]
