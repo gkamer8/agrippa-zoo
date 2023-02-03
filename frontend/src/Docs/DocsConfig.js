@@ -3,11 +3,17 @@
 export const SECTION_MAP = [
     null, 'main.md', {
         'getting-started': ['Getting Started', 'getting_started.md', {
-                'getting-started-1': ['Creating the Model', 'getting_started_1.md', {}],
-                'getting-started-2': ['Training the Model', 'getting_started_2.md', {}],
-                'getting-started-3': ['Inference', 'getting_started_3.md', {}],
-                'getting-started-4': ['Upload and Visualize', 'getting_started_4.md', {}]
-            }],
+            'getting-started-1': ['Creating the Model', 'getting_started_1.md', {}],
+            'getting-started-2': ['Training the Model', 'getting_started_2.md', {}],
+            'getting-started-3': ['Inference', 'getting_started_3.md', {}],
+            'getting-started-4': ['Upload and Visualize', 'getting_started_4.md', {}]
+        }],
+        'features': ['Advanced Features', 'features.md', {
+            'reps': ['Repeated Blocks', 'features_reps.md', {}],
+            'stretch': ['Stretched Blocks', 'features_stretch.md', {}],
+            'shared-parameters': ['Shared Parameters', 'features_shared_parameters.md', {}],
+            'frozen-parameters': ['Frozen Parameters', 'features_frozen_parameters.md', {}]
+        }],
         'nodes': ['Nodes', 'nodes.md', {
             'node-ops': ['Node Ops', 'node_ops.md', {
                 'add': ['Add', 'node_ops_add.md', {}],
