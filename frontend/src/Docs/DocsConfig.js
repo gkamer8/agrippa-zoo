@@ -24,6 +24,7 @@ export const SECTION_MAP = [
         'node-ops': ['Node Ops', 'node_ops.md', {
             'add': ['Add', 'node_ops_add.md', {}],
             'concat': ['Concat', 'node_ops_concat.md', {}],
+            'conv': ['Conv', 'node_ops_conv.md', {}],
             'identity': ['Identity', 'node_ops_identity.md', {}],
             'leaky-relu': ['Leaky Relu', 'node_ops_leaky_relu.md', {}],
             'lp-normalization': ['LP Norm', 'node_ops_lp_normalization.md', {}],
