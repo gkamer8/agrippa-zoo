@@ -8,13 +8,18 @@ export const SECTION_MAP = [
             'getting-started-3': ['Inference', 'getting_started_3.md', {}],
             'getting-started-4': ['Upload and Visualize', 'getting_started_4.md', {}]
         }],
-        'basics': ['Basics', 'basics.md', {
+        'basics': ['Markup Basics', 'basics.md', {
             'basics-model': ['Model Tag', 'basics_model_tag.md', {}],
             'basics-root-io': ['Model Inputs & Outputs', 'basics_root_io.md', {}],
             'basics-blocks': ['Blocks', 'basics_blocks.md', {}],
             'basics-nodes': ['Nodes', 'basics_nodes.md', {}],
             'basics-params': ['Parameters', 'basics_params.md', {}],
             'basics-exprs': ['Variables and Expressions', 'basics_exprs.md', {}]
+        }],
+        'package': ['Python Package', 'package.md', {
+            'package-export': ['Export', 'package_export.md', {}],
+            'package-pytorch': ['PyTorch', 'package_pytorch.md', {}],
+            'package-utils': ['Utilities', 'package_utils.md', {}]
         }],
         'rules': ['Rules', 'rules.md', {
             'no-stretch-and-rep': ['No Stretch and Rep', 'rules_no_stretch_and_rep.md', {}],
