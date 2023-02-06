@@ -40,7 +40,7 @@ function Home(props){
     }, [modelsLoaded, props.isLoggedIn, props.username]);
 
     let message = (
-        <div style={{'width': 'min(100%, 55em)', 'margin': '4em'}}>
+        <div id="landing-message">
             <div>
                 <h3>
                     About

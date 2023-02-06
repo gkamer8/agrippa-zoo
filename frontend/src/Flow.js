@@ -336,6 +336,10 @@ function Flow(props) {
         }
 
         let attrArr = []
+
+        // tag name
+        attrArr.push(['tag', node.el.nodeName, attrArr.length]);
+
         let attrs = node.el.attributes;
         for (let i=0; i<attrs.length; i++) {
             let attrib = attrs[i];
