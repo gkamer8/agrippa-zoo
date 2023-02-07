@@ -6,6 +6,17 @@
     min-width: 20%;
 }
 
+.resizer {
+    background-color: var(--bg);
+    width: 5px;
+    cursor: ew-resize;
+}
+
+.resizer:hover{
+    background-color: var(--impressed);
+}
+
+
 .import-node {
     width: unset;
     font-family: 'Courier New', Courier, monospace;

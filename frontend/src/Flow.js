@@ -425,8 +425,57 @@ function Flow(props) {
         )
     }
 
+    const [MousePosition, setMousePosition] = useState({
+        left: 0,
+        top: 0
+    })
+
+    function handleMouseMove(ev){
+        setMousePosition({left: ev.pageX, top: ev.pageY});
+    }
+
+    function resizeMouseMove(ev, resizer, leftSide, rightSide, left, top, leftWidth){
+
+        const dx = ev.clientX - left;
+        const dy = ev.clientY - top;
+
+        const newLeftWidth = ((leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
+        leftSide.style.width = `${newLeftWidth}%`;
+
+        resizer.style.cursor = 'col-resize';
+        document.body.style.cursor = 'col-resize';
+    }
+
+    function resizeMouseUp(ev, moveWrap, upWrap){
+        document.removeEventListener('mousemove', moveWrap);
+        document.removeEventListener('mouseup', upWrap);
+
+        document.body.style.cursor = 'unset';
+    }
+
+    function resizeMouseDown(ev){
+        const resizer = document.getElementById('dragMe');
+        const leftSide = resizer.previousElementSibling;
+        const rightSide = resizer.nextElementSibling;
+
+        const leftWidth = leftSide.getBoundingClientRect().width;
+
+        function moveWrap(ev){
+            resizeMouseMove(ev, resizer, leftSide, rightSide, MousePosition.left, MousePosition.top, leftWidth)
+        }
+
+        function upWrap(ev){
+            resizeMouseUp(ev, moveWrap, upWrap)
+        }
+
+        document.addEventListener("mousemove", moveWrap);
+        document.addEventListener("mouseup", upWrap);
+
+    }
+
     return (
-        <div style={{ width:'100%', height: '100%', display: 'flex'}}>
+        <div onMouseMove={(ev)=> handleMouseMove(ev)}
+             style={{ width:'100%', height: '100%', display: 'flex'}}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -443,6 +492,7 @@ function Flow(props) {
                     {focusedNodeControl}
                 </Panel>
             </ReactFlow>
+            <div onMouseDown={resizeMouseDown} className="resizer" id="dragMe"></div>
             {detailsMenu}
         </div>
     );
