@@ -425,32 +425,31 @@ function Flow(props) {
         )
     }
 
-    const [MousePosition, setMousePosition] = useState({
-        left: 0,
-        top: 0
-    })
+    // inspired by: https://htmldom.dev/create-resizable-split-views/
+    function resizeMouseMove(ev, resizer, leftSide, rightSide, left, top, rightWidth){
 
-    function handleMouseMove(ev){
-        setMousePosition({left: ev.pageX, top: ev.pageY});
-    }
+        const dx = left - ev.clientX;
 
-    function resizeMouseMove(ev, resizer, leftSide, rightSide, left, top, leftWidth){
-
-        const dx = ev.clientX - left;
-        const dy = ev.clientY - top;
-
-        const newLeftWidth = ((leftWidth + dx) * 100) / resizer.parentNode.getBoundingClientRect().width;
-        leftSide.style.width = `${newLeftWidth}%`;
+        const newRightWidth = rightWidth + dx;
+        rightSide.style.width = `${newRightWidth}px`;
 
         resizer.style.cursor = 'col-resize';
         document.body.style.cursor = 'col-resize';
+
+
+        rightSide.style.userSelect = 'none';
+        rightSide.style.pointerEvents = 'none';
+        
     }
 
-    function resizeMouseUp(ev, moveWrap, upWrap){
+    function resizeMouseUp(ev, moveWrap, upWrap, rightSide){
         document.removeEventListener('mousemove', moveWrap);
         document.removeEventListener('mouseup', upWrap);
 
         document.body.style.cursor = 'unset';
+
+        rightSide.style.removeProperty('user-select');
+        rightSide.style.removeProperty('pointer-events');
     }
 
     function resizeMouseDown(ev){
@@ -458,14 +457,18 @@ function Flow(props) {
         const leftSide = resizer.previousElementSibling;
         const rightSide = resizer.nextElementSibling;
 
-        const leftWidth = leftSide.getBoundingClientRect().width;
+        // const leftWidth = leftSide.getBoundingClientRect().width;
+        const rightWidth = rightSide.getBoundingClientRect().width;
 
-        function moveWrap(ev){
-            resizeMouseMove(ev, resizer, leftSide, rightSide, MousePosition.left, MousePosition.top, leftWidth)
+        const startX = ev.clientX;
+        const startY = ev.clientY;
+
+        let moveWrap = (ev) => {
+            resizeMouseMove(ev, resizer, leftSide, rightSide, startX, startY, rightWidth)
         }
 
-        function upWrap(ev){
-            resizeMouseUp(ev, moveWrap, upWrap)
+        let upWrap = (ev) => {
+            resizeMouseUp(ev, moveWrap, upWrap, rightSide);
         }
 
         document.addEventListener("mousemove", moveWrap);
@@ -474,7 +477,7 @@ function Flow(props) {
     }
 
     return (
-        <div onMouseMove={(ev)=> handleMouseMove(ev)}
+        <div
              style={{ width:'100%', height: '100%', display: 'flex'}}>
             <ReactFlow
                 nodes={nodes}
@@ -485,6 +488,7 @@ function Flow(props) {
                 onConnect={onConnect}
                 onNodeDoubleClick={onNodeDoubleClick}
                 fitView  // necessary for flow to call fitView
+                style={{flex: "1 1 0%"}}
             >
                 <Controls />
                 <Background />
