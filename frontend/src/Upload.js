@@ -271,7 +271,7 @@ function Upload(props) {
                 </div>
                 <div id="files">
                     <div className='form-row'>
-                        <FileUpload id="file-selector" onChange={handleFileChange} />
+                        <FileUpload value="Upload Project Zip" id="file-selector" onChange={handleFileChange} />
                     </div>
                 </div>
                 <div className='form-row'>
