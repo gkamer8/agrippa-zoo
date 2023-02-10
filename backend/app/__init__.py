@@ -48,4 +48,9 @@ def create_app(test_config=None):
     from . import update
     app.register_blueprint(update.bp)
 
+    @app.route("/")
+    def index():
+        return "We sail the ocean blue, and our saucy ship's a beauty."
+
     return app
+
