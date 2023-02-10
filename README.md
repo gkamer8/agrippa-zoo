@@ -15,7 +15,7 @@ python3 -m flask --app app init-db
 flask run
 ```
 
-You also need to place a file called `secrets.py` inside `backend/app` with the relevant secrets in order to download stuff from, inter alia, AWS. You'll need the file to look like:
+You also need to place a file called `secrets.py` inside `backend/app` with the relevant secrets in order to download stuff from, inter alia, AWS. You'll need the file to look like this example:
 
 ```
 AWS_ACCESS_KEY="ASDFBRUHZXCVBN"
