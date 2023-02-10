@@ -10,8 +10,8 @@ const DocsSearch = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // If the user types a little bit and then clicks - close the dropdown
   const inputRef = useRef(null);
-
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
@@ -38,11 +38,13 @@ const DocsSearch = () => {
     return result;
   }
 
+  // If the user selects somethign from the dropdown, close it and autofill
   const handleSelect = (name) => {
     setSearchTerm(name);
     setShowSuggestions(false);
   }
 
+  // Creating the appropriate suggestions
   const allSuggestions = flattenArray(SECTION_MAP, "/Docs");
   // We dont want the main to be searchable
   allSuggestions.shift()
