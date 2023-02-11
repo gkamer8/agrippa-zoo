@@ -4,6 +4,9 @@ import { BACKEND_URL } from "./Api";
 import { useNavigate } from 'react-router-dom';
 import "./Login.css"
 
+var MIN_LENGTH = 4;
+var MAX_LENGTH = 20;
+
 
 function Login(props){
 
@@ -72,6 +75,12 @@ function Login(props){
             else if (myJson.why === 'username_taken'){
                 setRegStatus(4);
             }
+            else if (myJson.why === 'username_invalid'){
+                setRegStatus(6);
+            }
+            else if (myJson.why === 'username_invalid_length'){
+                setRegStatus(5);
+            }
             else {
                 setRegStatus(3);
             }
@@ -82,14 +91,34 @@ function Login(props){
         }
     }
 
+    function isValidUsername(username) {
+        let validUsername = /^[a-zA-Z0-9_.-]+$/;
+        return validUsername.test(username) && username;
+    }
+      
+
     function submit(){
         setLoginStatus(1);  // loading
         sendReq();
     }
 
     function submitReg(){
+        let username = document.getElementById("reg-username").value;
+        if ( !isValidUsername(username)) {
+            console.log(username + " is not a valid username");
+            setRegStatus(6);
+            return
+        }
+        else if (username.length > MAX_LENGTH || username.length < MIN_LENGTH) {
+            console.log(username + " is not a valid length");
+            setRegStatus(5);
+            return
+        }
+        else {
+        console.log(username)
         setRegStatus(1);  // loading
         sendReqReg();
+        }
     }
 
     useEffect(() => {
@@ -122,6 +151,12 @@ function Login(props){
         }
         else if (regStatus === 4){
             setRegNotes("Username already taken; try again.");
+        }
+        else if (regStatus === 5){
+            setRegNotes("Username must be 4-20 characters.");
+        }
+        else if (regStatus === 6){
+            setRegNotes("Username must only include alphanumerics, underscores, periods, or dashes.");
         }
     }, [regStatus]);
 
