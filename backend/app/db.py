@@ -2,7 +2,7 @@ import click
 from flask import current_app, g
 import pymysql
 from pymysql.constants import CLIENT
-from .db_config import *
+from .secrets import *
 
 
 def get_db():
@@ -16,11 +16,11 @@ def get_db():
         """
         # db connection, not cursor!
         g.db = pymysql.connect(
-            host=ENDPOINT,
-            user=USER,
-            passwd=PASSWORD,
-            port=PORT,
-            database=DBNAME,
+            host=DB_ENDPOINT,
+            user=DB_USER,
+            passwd=DB_PASSWORD,
+            port=DB_PORT,
+            database=DB_NAME,
             client_flag=CLIENT.MULTI_STATEMENTS,
             cursorclass=pymysql.cursors.DictCursor
         )
