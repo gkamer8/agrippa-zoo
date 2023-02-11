@@ -17,3 +17,5 @@ Click submit, and, hopefully, your model is publicly available.
 ## Visualizing
 
 Once you have uploaded your model, you can go to its page from the Model Zoo and click through to view the model in the **Workspace**. From there, you can browse the model's files, click on nodes to see their children and attributes, or double click on blocks to view inside them.
+
+Inside any block or node, you can add a `<desc>` tag giving a description. The text contents of the `<desc>` tag will be displayed when the block or node is clicked in the visual editing tool.

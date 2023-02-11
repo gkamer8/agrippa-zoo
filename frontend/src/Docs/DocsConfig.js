@@ -49,5 +49,6 @@ export const SECTION_MAP = [
             'frozen-parameters': ['Frozen Parameters', 'features_frozen_parameters.md', {}],
             'sourced-blocks': ['Sourced Blocks', 'features_sourced_blocks.md', {}]
         }],
+        'visualize': ['Visualize', 'visualize.md', {}],
     }
 ]
