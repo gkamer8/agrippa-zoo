@@ -47,7 +47,7 @@ def token_required(f):
                 "SELECT username FROM users WHERE username=%s", (data['username'],)
             )
             match = db.fetchone()
-            current_user = match
+            current_user = match['username']
         except:
             return json.dumps({'response': 'failed', 'why': 'token_invalid'})
  

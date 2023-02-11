@@ -74,8 +74,6 @@ def upload(current_user):
     
     i = 0
     saved_new_name = new_name + ""
-    print(saved_new_name)
-    print(directories)
     while new_name in directories:
         new_name = saved_new_name + str(i)
         i += 1
@@ -83,20 +81,30 @@ def upload(current_user):
     upload_files_to_s3(request.files, new_name, session)  # this should correctly deal with zip files
 
     sql = """
-    INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
-    VALUES (%s,
-            %s,
-            %s,
-            %s,
-            %d,
-            %s,
-            %s,
-            %s
+    INSERT INTO `models` (`author_name`, `name`, `s3_storage_path`, `short_desc`, `canonical`, `tags`, `username`, `file_index`)
+    VALUES (%(author_name)s,
+            %(model_name)s,
+            %(new_name)s,
+            %(short_desc)s,
+            %(canonical)s,
+            %(tags)s,
+            %(current_user)s,
+            %(file_index)s
             );
     """
-
+    
     # Now add to database
-    cur.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user, file_index))
+    args = {
+        "author_name": author_name,
+        "model_name": model_name,
+        "new_name": new_name,
+        "short_desc": short_desc,
+        "canonical": canonical,
+        "tags": tags,
+        "current_user": current_user,
+        "file_index": file_index
+    }
+    cur.execute(sql, args)
     conn.commit()
 
     return json.dumps({'response': 'succeeded'})
