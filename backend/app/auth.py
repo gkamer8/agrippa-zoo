@@ -42,11 +42,12 @@ def token_required(f):
             return json.dumps({'response': 'failed', 'why': 'token_missing'})
         try:
             data = jwt.decode(token, AUTH_SECRET_KEY, algorithms=[AUTH_ALGO])
-            db = get_db()
-            match = db.execute(
-                "SELECT username FROM users WHERE username=?", (data['username'],)
-            ).fetchone()
-            current_user = match[0]
+            db = get_db().cursor()
+            db.execute(
+                "SELECT username FROM users WHERE username=%s", (data['username'],)
+            )
+            match = db.fetchone()
+            current_user = match
         except:
             return json.dumps({'response': 'failed', 'why': 'token_invalid'})
  
@@ -60,11 +61,12 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    # Translate column numnber into key
-    db = get_db()
-    match = db.execute(
-        "SELECT username, password_hash FROM users WHERE username=?", (username,)
-    ).fetchone()
+    # Translate column number into key
+    db = get_db().cursor()
+    db.execute(
+        "SELECT `username`, `password_hash` FROM users WHERE `username`=%s", (username,)
+    )
+    match = db.fetchone()
 
     if not match:
         return json.dumps({'response': 'failed', 'why': 'no_user_exists'})
@@ -86,7 +88,7 @@ def register():
 
     username = request.form['username']
     password = request.form['password']
-    db = get_db()
+    conn = get_db()
     error = None
 
     if not username:
@@ -96,11 +98,12 @@ def register():
 
     if error is None:
         try:
+            db = conn.cursor()
             db.execute(
-                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+                "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
                 (username, generate_password_hash(password)),
             )
-            db.commit()
+            conn.commit()
         except db.IntegrityError:
             error = json.dumps({'response': 'failed', 'why': 'username_taken'})
         else:

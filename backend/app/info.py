@@ -3,11 +3,15 @@ from app.db import get_db
 import json
 from flask_cors import cross_origin
 from .download import get_folder_manifest_from_s3
+import datetime
 
 bp = Blueprint('info', __name__, url_prefix='/info')
 
 def make_dict(row):
-    return dict(row)
+    for k in row:
+        if type(row[k]) == datetime.datetime:
+            row[k] = row[k].strftime("%m/%d/%Y, %H:%M:%S")
+    return row
 
 DEFAULT_LIMIT = 100
 DEFAULT_OFFSET = 0
@@ -33,33 +37,34 @@ def manifest():
         offset = DEFAULT_OFFSET
 
     # Translate column numnber into key
-    db = get_db()
+    db = get_db().cursor()
     manifest = None
+    # TODO: will have to redo offset given ROW_NUMBER not working in this version of Mysql 
     if username is None:
-        manifest = db.execute("""
+        db.execute("""
             SELECT *
             FROM
             (
-                SELECT id, author_name, name, short_desc, canonical, tags, ROW_NUMBER() OVER (ORDER BY name) AS rn
+                SELECT id, author_name, name, short_desc, canonical, tags
                 FROM models
                 ORDER BY name
-            )
-            WHERE rn > ?
-            LIMIT ?
-            """, (offset, limit)).fetchall()
+            ) tmp
+            LIMIT %s
+            """, (limit))
+        manifest = db.fetchall()
     else:
-        manifest = db.execute("""
+        db.execute("""
             SELECT *
             FROM
             (
-                SELECT id, author_name, name, short_desc, canonical, tags, ROW_NUMBER() OVER (ORDER BY name) AS rn
+                SELECT id, author_name, name, short_desc, canonical, tags
                 FROM models
-                WHERE username=?
+                WHERE username=%s
                 ORDER BY name
-            )
-            WHERE rn > ?
-            LIMIT ?
-            """, (username, offset, limit)).fetchall()
+            ) tmp
+            LIMIT %s
+            """, (username, limit))
+        manifest = db.fetchall()
 
     results = [make_dict(row) for row in manifest]
     data = json.dumps(results)
@@ -81,10 +86,12 @@ def model():
     if not model_id:
         return "A rollicking band of pirates we who tire of tossing on the sea"
     
-    db = get_db()
-    model_info = db.execute(
-        "SELECT * FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    model_id = int(model_id)
+    db = get_db().cursor()
+    db.execute(
+        "SELECT * FROM models WHERE id=%s", (model_id,)
+    )
+    model_info = db.fetchone()
 
     if not model_info:
         return json.dumps({'response': 'failed', 'why': 'no_model_exists'})

@@ -11,7 +11,6 @@ def create_app(test_config=None):
 
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'app.sqlite'),
         CORS_HEADERS='Content-Type'
     )
 

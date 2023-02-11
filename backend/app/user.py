@@ -51,7 +51,8 @@ def upload(current_user):
     except ValueError:
         return json.dumps({'response': 'failed', 'why': 'canonical_invalid_type'})
 
-    db = get_db()
+    conn = get_db()
+    cur = conn.cursor()
 
     session = get_s3_session()
     s3 = session.client('s3')
@@ -83,19 +84,19 @@ def upload(current_user):
 
     sql = """
     INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
-    VALUES (?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?
+    VALUES (%s,
+            %s,
+            %s,
+            %s,
+            %d,
+            %s,
+            %s,
+            %s
             );
     """
 
     # Now add to database
-    db.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user, file_index))
-    db.commit()
+    cur.execute(sql, (author_name, model_name, new_name, short_desc, canonical, tags, current_user, file_index))
+    conn.commit()
 
     return json.dumps({'response': 'succeeded'})

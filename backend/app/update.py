@@ -62,9 +62,11 @@ def delete(username):
     if not model_id:
         return "My name is John Wellington Wells"
     
-    db = get_db()
-    model_info = db.execute(
-        "SELECT id, username, s3_storage_path FROM models WHERE id=?", (model_id,)
+    conn = get_db()
+
+    cur = conn.cursor()
+    model_info = cur.execute(
+        "SELECT id, username, s3_storage_path FROM models WHERE id=%s", (model_id,)
     ).fetchone()
 
     if username != model_info['username']:
@@ -80,8 +82,8 @@ def delete(username):
     except:
         return json.dumps({'response': 'failed', 'why': 'error_removing_files_from_storage'})
 
-    db.execute("DELETE FROM models WHERE id = ?", (model_id,))
-    db.commit()
+    cur.execute("DELETE FROM models WHERE id = %s", (model_id,))
+    conn.commit()
 
     return json.dumps({'response': 'succeeded'})
 
@@ -100,10 +102,12 @@ def delete_file(username):
     if not model_id:
         return "For he himself has said it"
     
-    db = get_db()
-    model_info = db.execute(
-        "SELECT id, username, s3_storage_path, file_index FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT id, username, s3_storage_path, file_index FROM models WHERE id=%s", (model_id,)
+    )
+    model_info = cur.fetchone()
 
     if username != model_info['username']:
         return "And it's greatly to his credit"
@@ -134,10 +138,11 @@ def upload(username):
     if not model_id:
         return "When I was a lad a served a turn as office boy to an attorney's firm"
     
-    db = get_db()
-    model_info = db.execute(
-        "SELECT id, username, s3_storage_path FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    db = get_db().cursor()
+    db.execute(
+        "SELECT id, username, s3_storage_path FROM models WHERE id=%s", (model_id,)
+    )
+    model_info = db.fetchone()
 
     if username != model_info['username']:
         return "I cleaned the windows and I swept the floor and I polished off the handles of the big front door"
@@ -155,10 +160,12 @@ def edit(username):
     if not model_id:
         return "as office boy I made such a mark that they gave me the post of a junior clerk"
     
-    db = get_db()
-    model_info = db.execute(
-        "SELECT * FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM models WHERE id=%s", (model_id,)
+    )
+    model_info = cur.fetchone()
 
     if username != model_info['username']:
         return "I served the writs with a smile so bland and I copied all the letters with a big round hand"
@@ -186,7 +193,7 @@ def edit(username):
 
     args = (model_name, author_name, tags, short_desc, canonical, file_index, model_id)
 
-    db.execute("UPDATE models SET name=?, author_name=?, tags=?, short_desc=?, canonical=?, file_index=? WHERE id=?", args)
-    db.commit()
+    cur.execute("UPDATE models SET name=%s, author_name=%s, tags=%s, short_desc=%s, canonical=%s, file_index=%s WHERE id=%s", args)
+    conn.commit()
 
     return json.dumps({'response': 'succeeded'})

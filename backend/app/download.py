@@ -137,10 +137,11 @@ def markup():
     except:
         download = False
 
-    db = get_db()
-    desired = db.execute(
-        "SELECT id, s3_storage_path, file_index FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    db = get_db().cursor()
+    db.execute(
+        "SELECT id, s3_storage_path, file_index FROM models WHERE id=%s", (model_id,)
+    )
+    desired = db.fetchone()
 
     if not desired:
         return "are trying our hands at burglary"
@@ -157,16 +158,16 @@ def readme():
     if model_id is None:
         return "A rollicking band of pirates we who tired of tossing on the sea"
 
-    db = get_db()
-    desired = db.execute(
-        "SELECT id, s3_storage_path FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    db = get_db().cursor()
+    db.execute(
+        "SELECT id, s3_storage_path FROM models WHERE id=%s", (model_id,)
+    )
+    desired = db.fetchone()
 
     if not desired:
         return "are trying our hands at burglary"
     
-    # desired[1] should be the s3_storage_path
-    return get_readme_from_s3(desired[1])
+    return get_readme_from_s3(desired['s3_storage_path'])
 
 
 # Takes a model ID and filename of file inside the folder (e.g., "decoder.agr") and returns the file
@@ -182,16 +183,17 @@ def get_file():
 
     model_id = int(model_id)
 
-    db = get_db()
-    desired = db.execute(
-        "SELECT id, s3_storage_path FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    db = get_db().cursor()
+    db.execute(
+        "SELECT `id`, `s3_storage_path` FROM `models` WHERE `id`=%s", (model_id,)
+    )
+    desired = db.fetchone()
 
     if not desired:
         return "they seek a penalty fifty fold"
 
     # This may cause problems... will probably need to sanitize in some way...
-    path = desired[1] + "/" + filename
+    path = desired['s3_storage_path'] + "/" + filename
 
     return get_xml_from_s3(path, False)
 
@@ -206,10 +208,11 @@ def get_project():
 
     model_id = int(model_id)
 
-    db = get_db()
-    desired = db.execute(
-        "SELECT id, s3_storage_path, name FROM models WHERE id=?", (model_id,)
-    ).fetchone()
+    db = get_db().cursor()
+    db.execute(
+        "SELECT id, s3_storage_path, name FROM models WHERE id=%s", (model_id,)
+    )
+    desired = db.fetchone()
 
     if not desired:
         return "I've information vegetable animal and mineral"
