@@ -94,7 +94,7 @@ def register():
 
     username = request.form['username']
     password = request.form['password']
-    db = get_db()
+    conn = get_db()
     error = None
 
     if not username:
@@ -108,11 +108,11 @@ def register():
 
     if error is None:
         try:
+            db = conn.cursor()
             db.execute(
-                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
-                (username, generate_password_hash(password)),
+                "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
             )
-            db.commit()
+            conn.commit()
         except db.IntegrityError:
             error = json.dumps({'response': 'failed', 'why': 'username_taken'})
         else:
