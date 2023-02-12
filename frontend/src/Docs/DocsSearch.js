@@ -85,7 +85,7 @@ const DocsSearch = () => {
         <ul className="suggestions">
           {suggestions.map(suggestion => (
             <li key={suggestion.name}>
-              <Link onClick={() => handleSelect(suggestion.name)} className="link" to={suggestion.path}>{suggestion.name}</Link>
+              <Link onClick={() => handleSelect(suggestion.name)} className="sug-link" to={suggestion.path}>{suggestion.name}</Link>
             </li>
             
           ))}
