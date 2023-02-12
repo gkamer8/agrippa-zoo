@@ -5,10 +5,14 @@ import json
 from flask_cors import cross_origin
 from functools import wraps
 import jwt
+import re
 
 from .secrets import AUTH_SECRET_KEY
 import datetime
 
+
+MAX_USERNAME = 20
+MIN_USERNAME = 4
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -82,6 +86,10 @@ def login():
     return json.dumps({'response': 'succeeded', 'token': token})
 
 
+def is_valid_username(username):
+    valid_username = re.compile(r'^[a-zA-Z0-9_.-]+$')
+    return valid_username.match(username) is not None
+
 @bp.route('/register', methods=['POST'])
 @cross_origin()
 def register():
@@ -95,6 +103,10 @@ def register():
         error = json.dumps({'response': 'failed', 'why': 'username_missing'})
     elif not password:
         error = json.dumps({'response': 'failed', 'why': 'password_missing'})
+    elif not is_valid_username(username):
+        error = json.dumps({'response': 'failed', 'why': 'username_invalid'})
+    elif len(username) > MAX_USERNAME or len(username) < MIN_USERNAME:
+        error = json.dumps({'response': 'failed', 'why': 'username_invalid_length'})
 
     if error is None:
         try:
