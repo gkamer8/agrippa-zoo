@@ -1,53 +1,51 @@
 .search-box {
     position: relative;
-  }
+}
 
-  .search-box input {
-    width: 95%;
-    height: 1.5em;
-    font-size: 20px;
-    border-radius: 3px;
-  }
-  
-  
-  .suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--impressed);
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid gray;
-    z-index: 1;
-    display: block;
-  }
-  
-  .suggestions li {
-    cursor: pointer;
-    color: var(text);
-  }
-  
-  .suggestions li:hover {
-    background-color: var(--bg);
-  }
+.search-box input {
+  height: 1em;
+  font-size: 20px;
+  border-radius: 3px;
+}
 
-  .link {
-    display: block;
-    width: 100%;
-    height: 100%;
-    padding: 10px;
-  }
 
-  #input {
-    background-color: var(--soft-text);
-    color: var(--bg)
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--impressed);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid gray;
+  z-index: 1;
+  display: block;
+}
 
-  }
+.suggestions li {
+  cursor: pointer;
+  color: var(text);
+  overflow: hidden;
+}
 
-  #input::placeholder {
-    color: gray;
-    opacity: 1;
-  }
-  
+.suggestions li:hover {
+  background-color: var(--bg);
+}
+
+.link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
+#input {
+  background-color: var(--soft-text);
+  color: var(--bg)
+}
+
+#input::placeholder {
+  color: gray;
+  opacity: 1;
+}
