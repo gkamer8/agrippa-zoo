@@ -3,7 +3,8 @@
 #menu{
     text-align: left;
     padding: 1em;
-    min-width: 20%;
+    min-width: 25%;
+    max-width: calc(max(25%, 30em));
     box-sizing: border-box;
 }
 
@@ -77,4 +78,8 @@
     font-size: .75em;
     cursor: pointer;
     float: right;
+}
+
+.detail-description {
+    color: var(--soft-text)
 }

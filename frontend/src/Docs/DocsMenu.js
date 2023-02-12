@@ -1,6 +1,7 @@
 import './DocsMenu.css'
 import { SECTION_MAP } from './DocsConfig'
 import { Link } from 'react-router-dom'
+import DocsSearch from './DocsSearch'
 
 function DocsMenu(props){
 
@@ -30,7 +31,7 @@ function DocsMenu(props){
                 }
 
                 return (
-                    <div>
+                    <div key={id}>
                         <div className='menu-entry'>
                             <Link to={`${entry[2]}/${id}`}>{name}</Link>
                         </div>
@@ -41,7 +42,7 @@ function DocsMenu(props){
                 )
             }
             return (
-                <div className='menu-entry'>
+                <div className='menu-entry' key={name}>
                     <Link to={`${entry[2]}/${id}`}>{name}</Link>
                 </div>
             )
@@ -63,6 +64,7 @@ function DocsMenu(props){
 
     return (
         <div id="docs-menu-container">
+            <DocsSearch></DocsSearch>
             <h3>
                 <Link to="/Docs">
                     Menu

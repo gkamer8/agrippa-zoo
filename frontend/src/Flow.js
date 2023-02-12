@@ -336,6 +336,7 @@ function Flow(props) {
         }
 
         let attrArr = []
+        let desc = ""
 
         // tag name
         attrArr.push(['tag', node.el.nodeName, attrArr.length]);
@@ -359,11 +360,19 @@ function Flow(props) {
             else if (node.el.children[i].nodeName === 'params'){
                 attrArr.push(['params', node.el.children[i].attributes['name'].value, attrArr.length])
             }
+            else if (node.el.children[i].nodeName === 'desc'){
+                desc = (
+                    <p className='detail-description'>
+                        {node.el.children[i].textContent}
+                    </p>
+                );
+            }
         }
 
         let attrMap = attrArr.map(makeAttrRow);
         let newDetails = (
             <div id="detail-attrs">
+                {desc}
                 {attrMap}
             </div>
         );
