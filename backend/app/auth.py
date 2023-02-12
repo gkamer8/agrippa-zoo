@@ -5,6 +5,7 @@ import json
 from flask_cors import cross_origin
 from functools import wraps
 import jwt
+import re
 
 from .secrets import AUTH_SECRET_KEY
 import datetime
@@ -100,9 +101,9 @@ def register():
         error = json.dumps({'response': 'failed', 'why': 'username_missing'})
     elif not password:
         error = json.dumps({'response': 'failed', 'why': 'password_missing'})
-    elif is_valid_username(username):
+    elif not is_valid_username(username):
         error = json.dumps({'response': 'failed', 'why': 'username_invalid'})
-    elif username > MAX_USERNAME or username < MIN_USERNAME:
+    elif len(username) > MAX_USERNAME or len(username) < MIN_USERNAME:
         error = json.dumps({'response': 'failed', 'why': 'username_invalid_length'})
 
     if error is None:
