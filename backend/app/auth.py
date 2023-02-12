@@ -10,6 +10,9 @@ from .secrets import AUTH_SECRET_KEY
 import datetime
 
 
+MAX_USERNAME = 20
+MIN_USERNAME = 4
+
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 AUTH_EXP_HOURS = 24
@@ -42,12 +45,11 @@ def token_required(f):
             return json.dumps({'response': 'failed', 'why': 'token_missing'})
         try:
             data = jwt.decode(token, AUTH_SECRET_KEY, algorithms=[AUTH_ALGO])
-            db = get_db().cursor()
-            db.execute(
-                "SELECT username FROM users WHERE username=%s", (data['username'],)
-            )
-            match = db.fetchone()
-            current_user = match['username']
+            db = get_db()
+            match = db.execute(
+                "SELECT username FROM users WHERE username=?", (data['username'],)
+            ).fetchone()
+            current_user = match[0]
         except:
             return json.dumps({'response': 'failed', 'why': 'token_invalid'})
  
@@ -61,12 +63,11 @@ def login():
     username = request.form['username']
     password = request.form['password']
 
-    # Translate column number into key
-    db = get_db().cursor()
-    db.execute(
-        "SELECT `username`, `password_hash` FROM users WHERE `username`=%s", (username,)
-    )
-    match = db.fetchone()
+    # Translate column numnber into key
+    db = get_db()
+    match = db.execute(
+        "SELECT username, password_hash FROM users WHERE username=?", (username,)
+    ).fetchone()
 
     if not match:
         return json.dumps({'response': 'failed', 'why': 'no_user_exists'})
@@ -82,28 +83,35 @@ def login():
     return json.dumps({'response': 'succeeded', 'token': token})
 
 
+def is_valid_username(username):
+    valid_username = re.compile(r'^[a-zA-Z0-9_.-]+$')
+    return valid_username.match(username) is not None
+
 @bp.route('/register', methods=['POST'])
 @cross_origin()
 def register():
 
     username = request.form['username']
     password = request.form['password']
-    conn = get_db()
+    db = get_db()
     error = None
 
     if not username:
         error = json.dumps({'response': 'failed', 'why': 'username_missing'})
     elif not password:
         error = json.dumps({'response': 'failed', 'why': 'password_missing'})
+    elif is_valid_username(username):
+        error = json.dumps({'response': 'failed', 'why': 'username_invalid'})
+    elif username > MAX_USERNAME or username < MIN_USERNAME:
+        error = json.dumps({'response': 'failed', 'why': 'username_invalid_length'})
 
     if error is None:
         try:
-            db = conn.cursor()
             db.execute(
-                "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+                "INSERT INTO users (username, password_hash) VALUES (?, ?)",
                 (username, generate_password_hash(password)),
             )
-            conn.commit()
+            db.commit()
         except db.IntegrityError:
             error = json.dumps({'response': 'failed', 'why': 'username_taken'})
         else:
