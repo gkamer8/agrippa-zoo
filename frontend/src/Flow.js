@@ -75,6 +75,21 @@ function Flow(props) {
                 if (attrs['title']){
                     title = attrs['title'].value;
                 }
+
+                // Check if itm is a node a node really has an input - (you know, might just have a params)
+                if (el.nodeName === 'node'){
+                    let inputs = el.querySelectorAll("*>input");
+                    if (inputs.length === 0){
+                        return {
+                            id: id,
+                            className: "no-input-node",
+                            type: "input",
+                            position: { x: 0, y: 0 },
+                            data: { label: title },
+                            el: el
+                        }
+                    }
+                }
     
                 return { id: id, className: "regular-node", position: { x: 0, y: 0 }, data: { label: title }, el: el }
             }
