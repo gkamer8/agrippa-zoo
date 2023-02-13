@@ -1,14 +1,17 @@
-/* Creates a table that can be used as a manifest of models stored on Agrippa */
-/* Then creates a simple user table for login/register */
+DROP DATABASE IF EXISTS backend;
+
+CREATE DATABASE backend;
+
+USE backend;
 
 DROP TABLE IF EXISTS models;
 
 CREATE TABLE models (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    author_name TEXT NOT NULL,
-    name TEXT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    author_name VARCHAR(255),
+    name VARCHAR(255),
     short_desc TEXT,
-    canonical INTEGER,  /* Really a boolean */
+    canonical INT,  /* Really treat like boolean */
     tags TEXT,  /* A dictionary of tags like {"input": ["text", "tokens"], "output": ["distribution"], ...} */
     s3_storage_path TEXT,  /* assuming we know bucket is agrippa-files */
     username TEXT,
@@ -19,8 +22,8 @@ CREATE TABLE models (
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username varchar(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     time_created DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -81,6 +84,17 @@ VALUES ("Gordon Kamer",
         '{"input": ["text", "tokens"], "output": ["distribution"]}',
         'gkamer',
         'transformer.agr'
+        );
+
+INSERT INTO models (author_name, name, s3_storage_path, short_desc, canonical, tags, username, file_index)
+VALUES ("John Wellington Wells",
+        "Dealer in Magic and Spells",
+        "anthropic",
+        "This should actually just be the anthropic project",
+        0,
+        '{}',
+        'gkamer',
+        'anthropic.agr'
         );
 
 /* And now for users */
