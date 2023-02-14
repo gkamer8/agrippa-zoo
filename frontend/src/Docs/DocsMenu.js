@@ -75,7 +75,7 @@ function DocsMenu(props){
         <div id="docs-menu-container">
             <DocsSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
             <h3>
-                <Link to="/Docs">
+                <Link onClick={() => updateSearchTerm("")} to="/Docs">
                     Menu
                 </Link>
             </h3>

@@ -56,9 +56,10 @@ const DocsSearch = ({searchTerm: incomingSearchTerm, setParentSearchTerm}) => {
 
   // If the user selects somethign from the dropdown, close it, autofill, and navigate
   const handleSelect = (index) => {
-    console.log(index)
-    setSearchTerm(suggestions[index].name);
+    console.log(suggestions[index].path)
+    // window.location.href(suggestions[index].path)
     navigate(suggestions[index].path)
+    setSearchTerm(suggestions[index].name);
     hideSuggestions()
   }
 
@@ -122,7 +123,7 @@ const DocsSearch = ({searchTerm: incomingSearchTerm, setParentSearchTerm}) => {
         <ul className="suggestions">
           {suggestions.map((suggestion, index) => (
             <li key={suggestion.name}>
-              <Link onClick={() => handleSelect(index)} className={`sug-link ${selectedIndex === index ? "selected_docs" : ""}`}>{suggestion.name}</Link>
+              <Link to={suggestion.path} onClick={() => handleSelect(index)} className={`sug-link ${selectedIndex === index ? "selected_docs" : ""}`}>{suggestion.name}</Link>
             </li>
             
           ))}
