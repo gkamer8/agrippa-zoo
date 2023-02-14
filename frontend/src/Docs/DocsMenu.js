@@ -2,8 +2,16 @@ import './DocsMenu.css'
 import { SECTION_MAP } from './DocsConfig'
 import { Link } from 'react-router-dom'
 import DocsSearch from './DocsSearch'
+import { useState } from 'react';
 
 function DocsMenu(props){
+
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // When you click a link in the menu, call the callback function thats passed to the search feature so the search value updates
+    const updateSearchTerm = (term) => {
+        setSearchTerm(term);
+    };
 
     function makeMenuOption(lst){
         let subsections = lst[2]
@@ -33,7 +41,7 @@ function DocsMenu(props){
                 return (
                     <div key={id}>
                         <div className='menu-entry'>
-                            <Link to={`${entry[2]}/${id}`}>{name}</Link>
+                            <Link onClick={() => updateSearchTerm(name)} to={`${entry[2]}/${id}`}>{name}</Link>
                         </div>
                         <div className='section' id={id+"-section"} style={{'display': startingDisplay}}>
                             {newlinks}
@@ -43,7 +51,7 @@ function DocsMenu(props){
             }
             return (
                 <div className='menu-entry' key={name}>
-                    <Link to={`${entry[2]}/${id}`}>{name}</Link>
+                    <Link onClick={() => updateSearchTerm(name)} to={`${entry[2]}/${id}`}>{name}</Link>
                 </div>
             )
         }
@@ -62,9 +70,10 @@ function DocsMenu(props){
 
     let menuOptions = makeMenuOption(SECTION_MAP);
 
+
     return (
         <div id="docs-menu-container">
-            <DocsSearch></DocsSearch>
+            <DocsSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
             <h3>
                 <Link to="/Docs">
                     Menu

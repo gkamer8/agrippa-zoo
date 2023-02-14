@@ -1,14 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 import { SECTION_MAP } from './DocsConfig'
 import { TextInput } from "../Form";
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import './DocsSearch.css'
+import { useNavigate } from "react-router-dom";
 
 
-const DocsSearch = () => {
+const DocsSearch = ({searchTerm: incomingSearchTerm, setParentSearchTerm}) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(incomingSearchTerm);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const navigate = useNavigate();
+
+  // Allow parent to update search term
+  useEffect(() => {
+    setSearchTerm(incomingSearchTerm);
+  }, [incomingSearchTerm]);
+
+
 
   // If the user types a little bit and then clicks - close the dropdown
   const inputRef = useRef(null);
@@ -21,7 +31,7 @@ const DocsSearch = () => {
 
   const handleClickOutside = (event) => {
     if (inputRef.current && !inputRef.current.contains(event.target)) {
-      setShowSuggestions(false);
+      hideSuggestions()
     }
   };
 
@@ -38,10 +48,18 @@ const DocsSearch = () => {
     return result;
   }
 
-  // If the user selects somethign from the dropdown, close it and autofill
-  const handleSelect = (name) => {
-    setSearchTerm(name);
+  // Flattens the docs menu so all nodes are available in the autocomplete
+  function hideSuggestions() {
     setShowSuggestions(false);
+    setSelectedIndex(null)
+  }
+
+  // If the user selects somethign from the dropdown, close it, autofill, and navigate
+  const handleSelect = (index) => {
+    console.log(index)
+    setSearchTerm(suggestions[index].name);
+    navigate(suggestions[index].path)
+    hideSuggestions()
   }
 
   // Creating the appropriate suggestions
@@ -66,7 +84,26 @@ const DocsSearch = () => {
     if (filteredSuggestions.length > 0) {
       setShowSuggestions(true);
     } else {
-      setShowSuggestions(false);
+      hideSuggestions()
+    }
+  };
+
+  // Do stuff on arrows or enter key
+  const handleKeyDown = event => {
+    switch (event.keyCode) {
+      case 38: // up arrow
+        setSelectedIndex(selectedIndex > 0 ? selectedIndex - 1 : suggestions.length - 1);
+        break;
+      case 40: // down arrow
+        setSelectedIndex(selectedIndex === null || selectedIndex === suggestions.length - 1 ? 0 : selectedIndex + 1);
+        break;
+      case 13: // enter
+        if (suggestions.length > 0) {
+          handleSelect(selectedIndex !== null ? selectedIndex : 0);
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -78,14 +115,14 @@ const DocsSearch = () => {
         id="input"
         value={searchTerm}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         placeholder="Search Docs"
-        
       />
       {showSuggestions && (
         <ul className="suggestions">
-          {suggestions.map(suggestion => (
+          {suggestions.map((suggestion, index) => (
             <li key={suggestion.name}>
-              <Link onClick={() => handleSelect(suggestion.name)} className="sug-link" to={suggestion.path}>{suggestion.name}</Link>
+              <Link onClick={() => handleSelect(index)} className={`sug-link ${selectedIndex === index ? "selected_docs" : ""}`}>{suggestion.name}</Link>
             </li>
             
           ))}
