@@ -56,8 +56,6 @@ const DocsSearch = ({searchTerm: incomingSearchTerm, setParentSearchTerm}) => {
 
   // If the user selects somethign from the dropdown, close it, autofill, and navigate
   const handleSelect = (index) => {
-    console.log(suggestions[index].path)
-    // window.location.href(suggestions[index].path)
     navigate(suggestions[index].path)
     setSearchTerm(suggestions[index].name);
     hideSuggestions()
