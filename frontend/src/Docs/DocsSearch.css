@@ -49,3 +49,7 @@
   color: gray;
   opacity: 1;
 }
+
+.selected_docs {
+  background-color: #4e4b4b;
+}
