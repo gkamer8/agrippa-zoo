@@ -5,10 +5,11 @@ Any attribute in an architecture markup file can include an expression or a vari
 Expressions support the following operations:
 - `^` for powers
 - `*` for multiplication
-- `/` for division
+- `/` for regular division
 - `%` for modulus
 - `-` for subtraction
 - `+` for addition
+- `//` for integer division
 
 Variables inside expressions (or var()'s) are bound to the model in Python. For example, when you export a model containing an expression with the variable `nlayers`, you can specify `nlayers` when you export the model like so:
 
