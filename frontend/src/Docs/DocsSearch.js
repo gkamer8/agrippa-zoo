@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { SECTION_MAP } from './DocsConfig'
 import { TextInput } from "../Form";
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import './DocsSearch.css'
 import { useNavigate } from "react-router-dom";
 
@@ -19,21 +19,19 @@ const DocsSearch = ({searchTerm: incomingSearchTerm, setParentSearchTerm}) => {
   }, [incomingSearchTerm]);
 
 
-
   // If the user types a little bit and then clicks - close the dropdown
   const inputRef = useRef(null);
   useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (inputRef.current && !inputRef.current.contains(event.target)) {
+          hideSuggestions()
+        }
+      };
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
-  const handleClickOutside = (event) => {
-    if (inputRef.current && !inputRef.current.contains(event.target)) {
-      hideSuggestions()
-    }
-  };
 
 
   // Flattens the docs menu so all nodes are available in the autocomplete
