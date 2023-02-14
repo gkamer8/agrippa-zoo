@@ -65,9 +65,10 @@ def delete(username):
     conn = get_db()
 
     cur = conn.cursor()
-    model_info = cur.execute(
+    cur.execute(
         "SELECT id, username, s3_storage_path FROM models WHERE id=%s", (model_id,)
-    ).fetchone()
+    )
+    model_info = cur.fetchone()
 
     if username != model_info['username']:
         return "I'm a dealer in magic and spells"

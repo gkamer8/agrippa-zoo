@@ -39,10 +39,17 @@ function Model(props){
             let url = BACKEND_URL + "info/model?id=" + id + "&file_manifest=1";
             try {
                 const response = await fetch(url);
+            
                 const myJson = await response.json(); //extract JSON from the http response
             
-                setModelInfo(myJson);
-                setModelLoaded(true);
+                if (myJson.response === 'failed'){
+                    console.error(myJson.why);
+                    setModelLoadFailed(true);
+                }
+                else {
+                    setModelInfo(myJson);
+                    setModelLoaded(true);
+                }
             } 
             catch (error) {
                 console.error(error);
