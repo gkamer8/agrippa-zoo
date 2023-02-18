@@ -47,7 +47,8 @@ export const SECTION_MAP = [
             'stretch': ['Stretched Blocks', 'features_stretch.md', {}],
             'shared-parameters': ['Shared Parameters', 'features_shared_parameters.md', {}],
             'frozen-parameters': ['Frozen Parameters', 'features_frozen_parameters.md', {}],
-            'sourced-blocks': ['Sourced Blocks', 'features_sourced_blocks.md', {}]
+            'sourced-blocks': ['Sourced Blocks', 'features_sourced_blocks.md', {}],
+            'exposed': ['Expose Internal', 'features_exposed.md', {}]
         }],
         'visualize': ['Visualize', 'visualize.md', {}],
     }

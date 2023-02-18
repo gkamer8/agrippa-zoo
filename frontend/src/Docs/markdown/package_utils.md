@@ -33,3 +33,7 @@ Second, the `agrippa.utils.save_torch_model` saves the weights of a model traine
 agrippa.utils.save_torch_model(torch_model, "my-project", "weights.pkl")
 ```
 Saves a new version of `weights.pkl` into the `my-project` directory.
+
+## Find Internal Names
+
+The Agrippa project compiles to ONNX, which requires changing some names around, especially for repeated blocks and stretch directives. You can see how those names are mangled (or just viewing compilation internals for debugging) by setting `log=True` in `agrippa.export`. A `log.json` file will be produced. The `log.json` file can be searched using `agrippa.utils.search_log` and setting the `name` parameter to the title of what you're searching for. The result will be a dictionary with various information. The returned objects are those with titles (ONNX names) that contain the `name` as a substring. For example, a search for `Embed` would return information about a node with `title="MyEmbedNode"` as an attribute.
