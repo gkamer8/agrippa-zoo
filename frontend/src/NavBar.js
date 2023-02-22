@@ -1,6 +1,6 @@
 import './NavBar.css';
 import { Link } from 'react-router-dom';
-import logo from './resources/AgrippaLogo.png';
+import logo from './resources/AgrippaLogoLargePaperclip.png';
 
 function NavBar(props){
 

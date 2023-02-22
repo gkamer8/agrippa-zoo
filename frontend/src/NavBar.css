@@ -13,7 +13,7 @@
 }
 
 .navbar-logo-image {
-    height: 2em;
+    height: 2.25em;
     margin-right: 1em;
 
     vertical-align: middle;
@@ -22,7 +22,7 @@
 .little-text {
     margin-left: 1em;
     margin-right: 1em;
-    padding-top: .25em;
+    padding-top: .5em;
     vertical-align: middle;
 
     text-decoration: underline;
