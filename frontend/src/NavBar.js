@@ -1,5 +1,6 @@
 import './NavBar.css';
 import { Link } from 'react-router-dom';
+import logo from './resources/AgrippaLogo.png';
 
 function NavBar(props){
 
@@ -32,7 +33,7 @@ function NavBar(props){
         <div className='nav-container'>
             <div>
                 <Link to="/">
-                    <span className='big-text'>Agrippa</span>
+                    <img src={logo} className='navbar-logo-image' alt="logo" />
                 </Link>
             </div>
             <div>
