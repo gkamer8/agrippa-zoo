@@ -1,6 +1,8 @@
 # Variables and Expressions
 
-Any attribute in an architecture markup file can include an expression or a variable. An expression is given by `expr()`, and a variable is given by `var()`. 
+Any attribute in an architecture markup file can include an expression or a variable. An expression is given by `expr()`, and a variable is given by `var()`.
+
+Currently, expressions can only process simple integers and floats. They do not support more complex datatypes.
 
 Expressions support the following operations:
 - `^` for powers
@@ -20,6 +22,8 @@ bindings = {
 
 agrippa.export('example-proj', 'out.onnx', bindings=bindings)
 ```
+
+Please note that for now, variables are meant to stand for XML attribute values, which means that they are converted to strings during compilation. You should avoid using complex datatypes like tensors, though lists are allowed. If you are trying to use a large, complicated value in a variable, try making the value an input to the model instead so that it can be processed in the runtime environment.
 
 The two lines `expr(my_var)` and `var(my_var)` are equivalent, though expr(my_var * 2) is allowed while var(my_var * 2) is not.
 
