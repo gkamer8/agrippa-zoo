@@ -37,6 +37,7 @@ export const SECTION_MAP = [
             'mul': ['Mul', 'node_ops_mul.md', {}],
             'relu': ['Relu', 'node_ops_relu.md', {}],
             'reduce-mean': ['Reduce Mean', 'node_ops_reduce_mean.md', {}],
+            'reduce-sum': ['Reduce Sum', 'node_ops_reduce_sum.md', {}],
             'softmax': ['Softmax', 'node_ops_softmax.md', {}],
             'sqrt': ['Sqrt', 'node_ops_sqrt.md', {}],
             'sub': ['Sub', 'node_ops_sub.md', {}],

@@ -12,19 +12,23 @@
     display: flex;
 }
 
-.big-text {
-    font-size: 1.5em;
-    margin-right: .5em;
+.navbar-logo-image {
+    height: 2.25em;
+    margin-right: 1em;
+
+    vertical-align: middle;
 }
 
 .little-text {
     margin-left: 1em;
     margin-right: 1em;
-    padding-top: .3em;  /* this is mostly to do with the Big Text not being an image, yet */
+    padding-top: .5em;
     vertical-align: middle;
 
     text-decoration: underline;
     text-decoration-color: var(--accent);
+
+    font-size: 1.25em;
 
     display: inline-block;
 }
