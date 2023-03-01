@@ -263,6 +263,10 @@ function Flow(props) {
                 }
             }
 
+            // When going through edges, determine if anything doesn't have input/output node and set type accordingly
+            let hasInput = {}
+            let hasOutput = {}
+
             // Go through outputs, make edges from output block to all blocks with that input
             let existingEdges = {} // dictionary of "id->id"->true
             for (const key in outputFromNode) {
@@ -274,11 +278,24 @@ function Flow(props) {
                             let arrowStr = outputs[i]+"->"+inputs[k];
                             if (!existingEdges[arrowStr] && outputs[i] !== inputs[k]){
                                 let newEdge = { id: arrowStr, source: outputs[i], target: inputs[k] };
+                                hasInput[inputs[k]] = true;
+                                hasOutput[outputs[i]] = true;
+
                                 newEdges.push(newEdge);
                                 existingEdges[arrowStr] = true;
                             }
                         }
                     }
+                }
+            }
+
+            // Final check for correctly deducing node type
+            for (let i = 0; i < newNodes.length; i++){
+                if (!(newNodes[i].id in hasInput)){
+                    newNodes[i].type = "input";
+                }
+                if (!(newNodes[i].id in hasOutput)){
+                    newNodes[i].type = "output";
                 }
             }
 
@@ -295,7 +312,6 @@ function Flow(props) {
                 // It's pretty dumb; can you figure out a better way?
                 let lab = nodes[i].data.label
                 let labLen = lab.length;
-                console.log(labLen)
                 let newWidth = 20 + labLen * 7.15;  // 20 for the padding
                 newWidth = 150 > newWidth ? 150 : newWidth; 
                 g.setNode(nodes[i].id, {width: newWidth, height: 50});
