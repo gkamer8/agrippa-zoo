@@ -49,7 +49,7 @@ function Upload(props) {
     }
 
     function notifyMissing(name){
-        alert(`Missing ${name}`);
+        setErrorMessage(`Missing ${name}`);
     }
 
     async function sendToAPI() {
@@ -218,8 +218,22 @@ function Upload(props) {
     const inputTagLabels = [...Array(inputTags.length).keys()].map(makeInputTag);
     const outputTagLabels = [...Array(outputTags.length).keys()].map(makeOutputTag);
     let statusText = "";
+    
+    // Notify error
+
+    
     if (sentStatus === 0){
-        statusText = "";  // Nothing has happened
+
+        if (errorMessage){
+            statusText = (
+                <span className='upload-error-message'>
+                    Error: {errorMessage}
+                </span>
+            );
+        }
+        else {
+            statusText = "";  // Nothing has happened
+        }
     }
     else if (sentStatus === 1){
         statusText = "Submitting...";

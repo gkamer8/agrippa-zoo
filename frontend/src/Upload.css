@@ -24,3 +24,7 @@
     font-size: .75em;
     cursor: pointer;
 }
+
+.upload-error-message {
+    color: #ec2f2f;
+}
