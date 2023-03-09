@@ -1,6 +1,6 @@
-import { TextInput, Checkmark } from "./Form";
+import { TextInput, Checkmark, Button } from "./Form";
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ModelTable.css'
 
 
@@ -8,12 +8,15 @@ import './ModelTable.css'
 function SearchableTable(props) {
 
     const origModels = props.content;
+    const maxRows = props.maxRows;
     
     const [models, setModels] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [canonChecked, setCanonChecked] = useState(false);
+    const [curPage, setCurPage] = useState(1);
 
     useEffect(() => {
+
         if (searchText !== ""){
             let newModels = origModels.filter(function(model) {
                 return model.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1;
@@ -24,7 +27,6 @@ function SearchableTable(props) {
                     return model.canonical;
                 });
             }
-
             setModels(newModels);
         }
         else {
@@ -87,7 +89,49 @@ function SearchableTable(props) {
         setCanonChecked(!canonChecked);
     }
 
-    const listItems = models.map(makeSquare);
+    function pageCallback(page){
+        setCurPage(page)
+    }
+
+    function makePageSelector(page){
+        let txt = page
+        if (page === curPage){
+            txt = <span style={{'textDecoration': 'underline'}}>{page}</span>
+        }
+        return (
+            <span onClick={() => pageCallback(page)} className="table-page-selector">
+                {txt}
+            </span>
+        )
+    }
+
+    function getNumPages(){
+        return Math.ceil(models.length / maxRows)
+    }
+
+    function advancePage(){
+        if (curPage < getNumPages()){
+            setCurPage(curPage + 1)
+        }
+    }
+
+    let curPageModels = models;
+
+    let pageSelectors = ""
+    if (maxRows && getNumPages() > 1){
+
+        let pageList = [...Array(getNumPages()).keys()].map(i => i + 1).map(makePageSelector);
+        curPageModels = curPageModels.slice((curPage - 1) * maxRows, curPage * maxRows);
+        pageSelectors = (
+            <React.Fragment>
+                <Button value="Next" className="model-table-pages-next" onClick={advancePage} />
+                {pageList}
+            </React.Fragment>
+        )
+    }
+    
+    const listItems = curPageModels.map(makeSquare);
+
     return (
         <div className="model-table-container">
             <div className={'search-bar'}>
@@ -107,6 +151,9 @@ function SearchableTable(props) {
                 </thead>
                 <tbody>{listItems}</tbody>
             </table>
+            <div className="model-table-pages">
+                {pageSelectors}
+            </div>
         </div>
     )
 }

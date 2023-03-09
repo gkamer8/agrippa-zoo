@@ -40,3 +40,16 @@ users = cur.fetchall()
 print()
 print("Users:")
 print(users)
+
+print()
+cur.execute("SELECT version()")
+version = cur.fetchall()
+print(version)
+
+# Example using row number
+
+cur.execute("SET @row_number = 0")
+cur.execute("SELECT `id`, `name`, @row_number := @row_number+1 FROM `models` ORDER BY `id`")
+print()
+res = cur.fetchall()
+print(res)
