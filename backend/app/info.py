@@ -39,46 +39,35 @@ def manifest():
     # Translate column numnber into key
     db = get_db().cursor()
     manifest = None
-
-    db.execute("SET @row_number = 0")
+    # TODO: will have to redo offset given ROW_NUMBER not working in this version of Mysql 
     if username is None:
         db.execute("""
             SELECT *
             FROM
             (
-                SELECT id, author_name, name, short_desc, canonical, tags, (@row_number := @row_number+1) AS rn
+                SELECT id, author_name, name, short_desc, canonical, tags
                 FROM models
                 ORDER BY name
             ) tmp
-            WHERE rn > %s
-            ORDER BY name
             LIMIT %s
-            """, (offset, limit))
+            """, (limit))
         manifest = db.fetchall()
     else:
         db.execute("""
             SELECT *
             FROM
             (
-                SELECT id, author_name, name, short_desc, canonical, tags, (@row_number := @row_number+1) AS rn
+                SELECT id, author_name, name, short_desc, canonical, tags
                 FROM models
-                WHERE username = %s
+                WHERE username=%s
                 ORDER BY name
             ) tmp
-            WHERE rn > %s
-            ORDER BY name
             LIMIT %s
-            """, (username, offset, limit))
+            """, (username, limit))
         manifest = db.fetchall()
 
     results = [make_dict(row) for row in manifest]
-
-    response = {'response': 'succeeded',
-                'limit': limit,
-                'offset': offset,
-                'content': results}
-
-    data = json.dumps(response)
+    data = json.dumps(results)
 
     return data
 

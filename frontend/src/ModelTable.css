@@ -30,14 +30,3 @@ th {
 .model-table-container {
     margin-top: var(--def-margin);
 }
-
-.table-page-selector {
-    margin-right: .5em;
-    padding: .5em;
-    cursor: pointer;
-}
-
-.model-table-pages-next {
-    margin-right: .5em;
-    margin-top: .5em;
-}
