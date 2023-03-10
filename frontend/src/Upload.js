@@ -2,11 +2,13 @@ import './Upload.css';
 import { BACKEND_URL } from './Api';
 import { useState } from 'react';
 import { TextInput, TextBox, Button, Checkmark, FileUpload } from './Form';
+import JSZip from 'jszip'
 
 function Upload(props) {
 
     const [sentStatus, setSentStatus] = useState(0);
     const [fileArray, setFileArray] = useState([]);
+    const [fileNames, setFileNames] = useState([]);
     const [inputTags, setInputTags] = useState([]);
     const [outputTags, setOutputTags] = useState([]);
     const [canonChecked, setCanonChecked] = useState(false);
@@ -15,11 +17,38 @@ function Upload(props) {
     function handleFileChange(e){
         let fileList = e.target.files;
         let n = fileList.length;
-        let newFileArray = [];
+        setFileNames([]);
         for (let i = 0; i < n; i++){
-            newFileArray.push(fileList[i]);
+            const file = fileList[i];
+            if (file.name.indexOf(".zip") == file.name.length - 4){
+                console.log("IT'S A ZIP")
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const arrayBuffer = event.target.result;
+                    JSZip.loadAsync(arrayBuffer).then((zip) => {
+                    zip.forEach((relativePath, zipEntry) => {
+                            let shortName = relativePath.slice(relativePath.indexOf("/")+1, relativePath.length)
+                            console.log("Short name: " + shortName)
+                            if (shortName){
+                                // Note: this might cause bugs with synchronization...
+                                // It's OK so long as the user uploads just the one zip file
+                                let newFileNames = [...fileNames]
+                                newFileNames.push(shortName)
+                                setFileNames(newFileNames)
+                            }
+                        });
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            else {
+                let newFileNames = [...fileNames]
+                newFileNames.push(file.name)
+                setFileNames(newFileNames)
+            }
+
         }
-        setFileArray(newFileArray);
+        setFileArray(fileList);
         // addNewOption();
     }
 
@@ -62,6 +91,12 @@ function Upload(props) {
         let canonical = canonChecked;
         let file_index = document.getElementById('file-index').value;
         let tagData = getTagFormData();
+
+        // make sure file-index is file that actually exists
+        if (!fileNames.includes(file_index)){
+            setErrorMessage("Index file does not match any file uploaded.")
+            return;
+        }
 
         if (!model_name){
             notifyMissing("model name");
