@@ -23,9 +23,13 @@ function Home(props){
                 const response = await fetch(url);
                 const myJson = await response.json(); //extract JSON from the http response
             
+                if (myJson['response'] !== 'succeeded'){
+                    throw new Error("Server returned failed")
+                }
+
                 // "Cannot modify state directly", hence setState
                 setModelsLoaded(true);
-                setOrigModels(myJson);
+                setOrigModels(myJson['content']);
             } 
             catch (error) {
                 console.error(error);
@@ -118,7 +122,7 @@ function Home(props){
                         <h2>
                             Your Models
                         </h2>
-                        <ModelTable content={origModels} />
+                        <ModelTable content={origModels} maxRows={5} />
                     </div>
                 )   
             }

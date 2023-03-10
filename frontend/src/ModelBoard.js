@@ -6,8 +6,18 @@ import ModelTable from './ModelTable';
 function ModelBoard(props){
 
     const [origModels, setOrigModels] = useState([]);
+    const [models, setModels] = useState([]);
+
     const [modelsLoadFailed, setModelsLoadFailed] = useState(false);
     const [modelsLoaded, setModelsLoaded] = useState(false);
+
+    const maxRows = 10;
+
+    // Wrapper around setOrigModels and setModels to do pagination correctly
+    function makeModels(newModels){
+        setOrigModels(newModels)
+        setModels(newModels)
+    }
 
     useEffect(() => {
 
@@ -17,10 +27,14 @@ function ModelBoard(props){
             try {
                 const response = await fetch(url);
                 const myJson = await response.json(); //extract JSON from the http response
+
+                if (myJson['response'] !== 'succeeded'){
+                    throw new Error("Server returned failed")
+                }
             
                 // "Cannot modify state directly", hence setState
                 setModelsLoaded(true);
-                setOrigModels(myJson);
+                makeModels(myJson['content']);
             } 
             catch (error) {
                 console.error(error);
@@ -32,7 +46,7 @@ function ModelBoard(props){
             getModels();
         }
 
-    }, [modelsLoaded]);
+    }, [modelsLoaded, makeModels]);
 
     if (modelsLoaded === 0 && modelsLoadFailed === false){
         return (
@@ -48,7 +62,7 @@ function ModelBoard(props){
         return (
             <div className='content-container'>
                 <div className='table-container'>
-                    <ModelTable content={origModels} />
+                    <ModelTable content={models} maxRows={maxRows} />
                 </div>
             </div>
         )
