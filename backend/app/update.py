@@ -3,11 +3,12 @@ from flask import Blueprint, request, make_response
 from app.db import get_db
 import boto3
 from flask_cors import cross_origin
-from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
+from .secrets import S3_BUCKET_NAME
 from .auth import token_required
 import json
 import io
 import zipfile
+from .storage import get_boto3_client
 
 
 """
@@ -17,8 +18,6 @@ Meant to be endpoint for updating/editing/deleting models
 """
 
 bp = Blueprint('update', __name__, url_prefix='/update')
-
-BUCKET_NAME = 'agrippa-files'
 
 
 # Uploads files to s3 in bucket/folder_name using session
@@ -40,19 +39,12 @@ def upload_files_to_s3(files, folder_name, session):
                     for new_fname, old_fname in zip(new_names, namelist):
                         if new_fname:
                             fbytes = z.read(old_fname)
-                            object = res.Object(BUCKET_NAME, f'{folder_name}/{new_fname}')
+                            object = res.Object(S3_BUCKET_NAME, f'{folder_name}/{new_fname}')
                             object.put(Body=fbytes)
         else:
-            object = res.Object(BUCKET_NAME, f'{folder_name}/{filename}')
+            object = res.Object(S3_BUCKET_NAME, f'{folder_name}/{filename}')
             object.put(Body=file_bytes)
 
-
-def get_s3_session():
-    session = boto3.Session(
-                aws_access_key_id=AWS_ACCESS_KEY,
-                aws_secret_access_key=AWS_SECRET_KEY
-            )
-    return session
 
 @bp.route('/delete', methods=['POST'])
 @cross_origin()
@@ -76,10 +68,10 @@ def delete(username):
     # Straight up chatGPT
     # AWS buckets supposedly have no concept of folders, so we're deleting everything in the folder instead
     try:
-        s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
-        response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=model_info['s3_storage_path'])
+        s3 =get_boto3_client()
+        response = s3.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=model_info['s3_storage_path'])
         objects_to_delete = [{'Key': obj['Key']} for obj in response.get('Contents', [])]
-        s3.delete_objects(Bucket=BUCKET_NAME, Delete={'Objects': objects_to_delete})
+        s3.delete_objects(Bucket=S3_BUCKET_NAME, Delete={'Objects': objects_to_delete})
     except:
         return json.dumps({'response': 'failed', 'why': 'error_removing_files_from_storage'})
 
@@ -122,9 +114,9 @@ def delete_file(username):
     # Straight up chatGPT
     # AWS buckets supposedly have no concept of folders, so we're deleting everything in the folder instead
     try:
-        s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+        s3 = get_boto3_client()
         objects_to_delete = [{'Key': model_info['s3_storage_path'] + "/" + file_to_delete}]
-        s3.delete_objects(Bucket=BUCKET_NAME, Delete={'Objects': objects_to_delete})
+        s3.delete_objects(Bucket=S3_BUCKET_NAME, Delete={'Objects': objects_to_delete})
     except:
         return json.dumps({'response': 'failed', 'why': 'error_removing_files_from_storage'})
 
@@ -148,7 +140,7 @@ def upload(username):
     if username != model_info['username']:
         return "I cleaned the windows and I swept the floor and I polished off the handles of the big front door"
 
-    upload_files_to_s3(request.files, model_info['s3_storage_path'], get_s3_session())
+    upload_files_to_s3(request.files, model_info['s3_storage_path'], get_boto3_client())
 
     return json.dumps({'response': 'succeeded'})
 

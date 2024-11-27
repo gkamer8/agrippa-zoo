@@ -17,7 +17,6 @@ DB_ENDPOINT="notarealendpoint.com"
 DB_PORT=3306
 DB_USER="admin"
 DB_PASSWORD="notarealpassword"
-DB_REGION="us-east-1"
 DB_NAME="backend"
 ```
 
@@ -31,8 +30,10 @@ You also need to place a file called `secrets.py` inside `backend/app` with the 
 
 ```
 # For access to S3
-AWS_ACCESS_KEY="ASDFBRUHZXCVBN"
-AWS_SECRET_KEY="b/RA1NYnasGAWGajksbdgAWBEoigw1263ebg"
+S3_ACCESS_KEY = "ASDFBRUHZXCVBN"
+S3_SECRET_KEY = "b/RA1NYnasGAWGajksbdgAWBEoigw1263ebg"
+S3_ENDPOINT_URL = None  # Can switch to use s3 compatible API vs. AWS
+S3_BUCKET_NAME = "agrippa-files"
 
 # This can be anything - just for the auth tokens
 AUTH_SECRET_KEY="bruh-bruh-bruh"
@@ -42,7 +43,6 @@ DB_ENDPOINT="notarealendpoint.com"
 DB_PORT=3306
 DB_USER="admin"
 DB_PASSWORD="notarealpassword"
-DB_REGION="us-east-1"
 DB_NAME="backend"
 
 ```

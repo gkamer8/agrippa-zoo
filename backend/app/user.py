@@ -2,10 +2,11 @@ from flask import Blueprint, request
 from app.db import get_db
 import json
 from flask_cors import cross_origin
-from .update import upload_files_to_s3, BUCKET_NAME, get_s3_session
+from .update import upload_files_to_s3
+from .storage import get_boto3_client
 from .auth import token_required
 import boto3
-from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
+from .secrets import S3_BUCKET_NAME
 import random
 
 bp = Blueprint('user', __name__, url_prefix='/user')
@@ -54,9 +55,9 @@ def upload(current_user):
     conn = get_db()
     cur = conn.cursor()
 
-    session = get_s3_session()
+    session = get_boto3_client()
     s3 = session.client('s3')
-    result = s3.list_objects_v2(Bucket=BUCKET_NAME)
+    result = s3.list_objects_v2(Bucket=S3_BUCKET_NAME)
     # Get a list of all the directories in the bucket
     directories = set([item['Key'].split("/")[0] for item in result.get('Contents', [])])
     # Get a unique folder name
