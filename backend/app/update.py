@@ -21,29 +21,35 @@ bp = Blueprint('update', __name__, url_prefix='/update')
 
 
 # Uploads files to s3 in bucket/folder_name using session
-def upload_files_to_s3(files, folder_name, session):
-    res = session.resource('s3')
+def upload_files_to_s3(files, folder_name, s3):
     for file in files:
         file_bytes = files[file].read()
         filename = files[file].filename
         
-        # Is it a zip file?
-        if (filename.split(".")[-1] == 'zip'):
+        # Check if it is a zip file
+        if filename.split(".")[-1] == 'zip':
             with io.BytesIO(file_bytes) as zip_file:
                 with zipfile.ZipFile(zip_file, 'r') as z:
-                    # Print the names of the files in the zip file
+                    # Get the names of the files in the zip file
                     namelist = z.namelist()
                     # Remove folder name
-                    new_names = [x[x.index("/")+1:] for x in namelist]
-                    # Extract all files
+                    new_names = [x[x.index("/") + 1:] for x in namelist]
+                    # Extract and upload all files
                     for new_fname, old_fname in zip(new_names, namelist):
                         if new_fname:
                             fbytes = z.read(old_fname)
-                            object = res.Object(S3_BUCKET_NAME, f'{folder_name}/{new_fname}')
-                            object.put(Body=fbytes)
+                            s3.put_object(
+                                Bucket=S3_BUCKET_NAME,
+                                Key=f'{folder_name}/{new_fname}',
+                                Body=fbytes
+                            )
         else:
-            object = res.Object(S3_BUCKET_NAME, f'{folder_name}/{filename}')
-            object.put(Body=file_bytes)
+            # Upload the file directly
+            s3.put_object(
+                Bucket=S3_BUCKET_NAME,
+                Key=f'{folder_name}/{filename}',
+                Body=file_bytes
+            )
 
 
 @bp.route('/delete', methods=['POST'])

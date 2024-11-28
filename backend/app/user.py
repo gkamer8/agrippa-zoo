@@ -55,8 +55,7 @@ def upload(current_user):
     conn = get_db()
     cur = conn.cursor()
 
-    session = get_boto3_client()
-    s3 = session.client('s3')
+    s3 = get_boto3_client()
     result = s3.list_objects_v2(Bucket=S3_BUCKET_NAME)
     # Get a list of all the directories in the bucket
     directories = set([item['Key'].split("/")[0] for item in result.get('Contents', [])])
@@ -79,7 +78,7 @@ def upload(current_user):
         new_name = saved_new_name + str(i)
         i += 1
 
-    upload_files_to_s3(request.files, new_name, session)  # this should correctly deal with zip files
+    upload_files_to_s3(request.files, new_name, s3)  # this should correctly deal with zip files
 
     sql = """
     INSERT INTO `models` (`author_name`, `name`, `s3_storage_path`, `short_desc`, `canonical`, `tags`, `username`, `file_index`)

@@ -12,7 +12,7 @@ services:
     environment:
       FLASK_ENV: development
     depends_on:
-      - db
+      - mysql
 
   frontend:
     image: node:16
@@ -28,7 +28,7 @@ services:
     container_name: mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: mydatabase
+      MYSQL_DATABASE: backend
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:
@@ -42,9 +42,10 @@ services:
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-    command: server /data
+    command: server /data --console-address ":4000"
     ports:
       - "9000:9000"
+      - "4000:4000"
     volumes:
       - s3_data:/data
 

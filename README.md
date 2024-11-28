@@ -1,63 +1,32 @@
 # Getting Started
 
-First I'd recommend creating a virtual environment inside `backend` using
+## Secrets
+
+First, you'll need to create a `secrets.py` file in `backend/app`. This file configures secret keys for use on the backend. That file should look like the following (before replacing the default values with your own secrets):
 
 ```
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-The `db-help` directory contains some tools for working with the SQL database.
-
-It requires a file `cred.py` (which you will need to create) that has the credentials for the SQL server you want to deal with. Note: these can be different from the database credentials held in `secrets.py`, but they might be the same.
-
-```
-DB_ENDPOINT="notarealendpoint.com"
-DB_PORT=3306
-DB_USER="admin"
-DB_PASSWORD="notarealpassword"
-DB_NAME="backend"
-```
-
-**You don't need to do this, but if you want it later,** the `init.py` file re-initializes the database using `schema.sql`:
-
-```
-python init.py
-```
-
-You also need to place a file called `secrets.py` inside `backend/app` with the relevant secrets in order to download stuff from, inter alia, AWS. You'll need the file to look like this example:
-
-```
-# For access to S3
-S3_ACCESS_KEY = "ASDFBRUHZXCVBN"
-S3_SECRET_KEY = "b/RA1NYnasGAWGajksbdgAWBEoigw1263ebg"
-S3_ENDPOINT_URL = None  # Can switch to use s3 compatible API vs. AWS
+# For access to S3 compatible API
+S3_ACCESS_KEY = "minioadmin"
+S3_SECRET_KEY = "minioadmin"
+S3_ENDPOINT_URL = "http://s3:9000"
 S3_BUCKET_NAME = "agrippa-files"
+S3_USE_SSL = False
 
 # This can be anything - just for the auth tokens
 AUTH_SECRET_KEY="bruh-bruh-bruh"
 
 # For a MySQL backend database
-DB_ENDPOINT="notarealendpoint.com"
-DB_PORT=3306
-DB_USER="admin"
-DB_PASSWORD="notarealpassword"
-DB_NAME="backend"
-
+DB_ENDPOINT = "mysql"
+DB_PORT = 3306
+DB_USER = "root"
+DB_PASSWORD = "rootpassword"
+DB_NAME = "backend"
 ```
 
-You can run the backend with:
+## S3 Bucket
 
-```
-flask run
-```
+You will need to add a s3 bucket corresponding to the s3 bucket in `secrets.py`. With the built-in `minio` service, you can go to `localhost:4000` and create the bucket in the interface.
 
-On the frontend, you can install the packages and then run the Webpack server using:
+## Usage
 
-```
-yarn install
-yarn start
-```
-
-If this is giving you serious trouble, you can probably use `npm install` instead.
+This repo is run using `docker-compose up` from the root directory. The MySQL database will automatically initialize.
