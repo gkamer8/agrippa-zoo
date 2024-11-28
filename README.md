@@ -30,3 +30,19 @@ You will need to add a s3 bucket corresponding to the s3 bucket in `secrets.py`.
 ## Usage
 
 This repo is run using `docker-compose up` from the root directory. The MySQL database will automatically initialize.
+
+# Using Backup Data
+
+## S3
+
+In order to bring in data from an existing AWS bucket, use:
+
+```
+aws s3 sync s3://agrippa-files your-local-folder
+```
+
+assuming that the s3 bucket is called `agrippa-files`. You of course must have the AWS CLI, and uou may need to use `aws configure` to set relevant credentials and set the default availability zone (wherever the bucket is stored). Once it's downloaded, you can go to the minio console, create a bucket, go to "browse files" and drag and drop the interior folders.
+
+## MySQL
+
+For the MySQL data, you can use the `mysqldump` utility or another mysql client like DBeaver to first download the MySQL database as a .sql file. Then you can connect to the database (like via `docker-compose exec`) and run the backup file.
