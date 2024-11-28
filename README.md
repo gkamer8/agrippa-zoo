@@ -23,6 +23,16 @@ DB_PASSWORD = "rootpassword"
 DB_NAME = "backend"
 ```
 
+## Frontend Config
+
+You need to create a file called `Api.js` in `frontend/src` containing the backend URL, like:
+
+```
+export const BACKEND_URL = 'http://127.0.0.1:5000/';
+```
+
+if your backend is at localhost. This URL needs to be publicly accessible so that a user can reach it directly from his browser.
+
 ## S3 Bucket
 
 You will need to add a s3 bucket corresponding to the s3 bucket in `secrets.py`. With the built-in `minio` service, you can go to `localhost:4000` and create the bucket in the interface.
