@@ -29,7 +29,7 @@ You will need to add a s3 bucket corresponding to the s3 bucket in `secrets.py`.
 
 ## Usage
 
-This repo is run using `docker-compose up` from the root directory. The MySQL database will automatically initialize.
+There are two profiles: `dev` and `prod`. This repo is run using `docker-compose --profile dev up` or `docker-compose --profile prod up` from the root directory. The MySQL database will automatically initialize the first time.
 
 # Using Backup Data
 
