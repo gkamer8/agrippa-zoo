@@ -1,17 +1,14 @@
 from statistics import mode
 from flask import Blueprint, request, make_response
 from app.db import get_db
-import boto3
 from flask_cors import cross_origin
-from .secrets import AWS_ACCESS_KEY, AWS_SECRET_KEY
-import json
+from .secrets import S3_BUCKET_NAME
 import io
 import zipfile
+from .storage import get_boto3_client
 
 
 bp = Blueprint('download', __name__, url_prefix='/download')
-
-BUCKET_NAME = 'agrippa-files'
 
 
 # Returns list of file paths in folder with name passed as argument "path"
@@ -19,14 +16,13 @@ BUCKET_NAME = 'agrippa-files'
 # exclude_prefix determines whether to include the s3 folder name or not
 def get_folder_manifest_from_s3(path, exclude_prefix=False, allowed_extensions=None):
 
-
     if not path:
         return []
 
-    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+    s3 = get_boto3_client()
 
     # Retrieve a manifest (basically I think) of the contents of a folder
-    result = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=path + "/")
+    result = s3.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=path + "/")
 
     to_return = []
 
@@ -56,11 +52,11 @@ def get_folder_manifest_from_s3(path, exclude_prefix=False, allowed_extensions=N
 # Takes the full path from the bucket to a file as well as whether it should be downloaded
 # returns the proper response (i.e., an endpoint function calling this should end with return get_xml_from_s3(...))
 def get_xml_from_s3(path, download):
-    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+    s3 = get_boto3_client()
 
     # Retrieve the file
     try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=path)
+        response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=path)
     except:
         # Probably a no such key error
         return ""
@@ -83,7 +79,7 @@ def get_xml_from_s3(path, download):
 def get_file_bytes_from_s3(path, s3):
     # Retrieve the file
     try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=path)
+        response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=path)
     except:
         # Probably a no such key error
         return ""
@@ -109,10 +105,10 @@ def get_readme_from_s3(path):
         return ""
 
     # Create an S3 client
-    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+    s3 = get_boto3_client()
 
     # Retrieve the file
-    response = s3.get_object(Bucket=BUCKET_NAME, Key=md_path)
+    response = s3.get_object(Bucket=S3_BUCKET_NAME, Key=md_path)
 
     # Print the contents of the file
     resp_bytes = response['Body'].read()
@@ -226,7 +222,7 @@ def get_project():
     mani = get_folder_manifest_from_s3(desired['s3_storage_path'])
 
     file_bytes = []
-    s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+    s3 = get_boto3_client()
     for fname in mani:
         file_bytes.append(get_file_bytes_from_s3(fname, s3))
 
