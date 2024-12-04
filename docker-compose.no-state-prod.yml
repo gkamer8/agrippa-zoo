@@ -7,13 +7,12 @@ services:
       - ./backend:/app
     ports:
       - "5000:5000"
+    restart: always
 
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    volumes:
-      - ./frontend:/app
     ports:
       - "3000:3000"
-
+    restart: always
