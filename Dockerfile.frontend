@@ -1,0 +1,23 @@
+# Use a base image with Node.js
+FROM node:16
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and yarn.lock to the working directory
+COPY ./frontend/package.json ./frontend/yarn.lock ./
+
+# Install dependencies
+RUN yarn install
+
+# Copy the rest of the application code
+COPY ./frontend .
+
+# Build the frontend assets
+RUN yarn build
+
+# Install serve to serve the static files
+RUN yarn global add serve
+
+# Command to run your application
+CMD ["serve", "-s", "build"]

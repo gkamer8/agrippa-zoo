@@ -1,0 +1,25 @@
+# Use a base image with Python
+FROM python:3.9
+
+# Install dependencies for Rust
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the application code
+COPY ./backend /app
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install waitress
+
+# Command to run your application
+CMD ["waitress-serve", "--port=5000", "--call", "app:create_app"]
