@@ -112,7 +112,7 @@ def register():
         try:
             db = conn.cursor()
             db.execute(
-                "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+                "INSERT INTO users (username, password_hash, time_created) VALUES (%s, %s, NOW())",
                 (username, generate_password_hash(password)),
             )
             conn.commit()

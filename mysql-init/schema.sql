@@ -25,5 +25,5 @@ CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username varchar(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
-    time_created DATETIME DEFAULT CURRENT_TIMESTAMP
+    time_created DATETIME  /* Not using default timestamp anymore */
 );
