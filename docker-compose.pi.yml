@@ -8,6 +8,8 @@ services:
     ports:
       - "5000:5000"
     restart: unless-stopped
+    depends_on:
+      - mysql
 
   frontend:
     build:
@@ -19,7 +21,7 @@ services:
 
   mysql:
     platform: linux/arm64/v8
-    image: mysql:8
+    image: hypriot/rpi-mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: backend
