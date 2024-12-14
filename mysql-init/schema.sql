@@ -16,7 +16,7 @@ CREATE TABLE models (
     s3_storage_path TEXT,  /* assuming we know bucket is agrippa-files */
     username TEXT,
     file_index TEXT,  /* The index .agr file */
-    time_uploaded DATETIME DEFAULT CURRENT_TIMESTAMP
+    time_uploaded DATETIME  /* Not using default timestamp to support < MySQL 5.6 */
 );
 
 DROP TABLE IF EXISTS users;

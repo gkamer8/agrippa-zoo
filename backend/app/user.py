@@ -81,7 +81,7 @@ def upload(current_user):
     upload_files_to_s3(request.files, new_name, s3)  # this should correctly deal with zip files
 
     sql = """
-    INSERT INTO `models` (`author_name`, `name`, `s3_storage_path`, `short_desc`, `canonical`, `tags`, `username`, `file_index`)
+    INSERT INTO `models` (`author_name`, `name`, `s3_storage_path`, `short_desc`, `canonical`, `tags`, `username`, `file_index`, `time_uploaded`)
     VALUES (%(author_name)s,
             %(model_name)s,
             %(new_name)s,
@@ -89,7 +89,8 @@ def upload(current_user):
             %(canonical)s,
             %(tags)s,
             %(current_user)s,
-            %(file_index)s
+            %(file_index)s,
+            NOW()
             );
     """
     
