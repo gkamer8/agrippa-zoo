@@ -21,7 +21,7 @@ services:
 
   mysql:
     platform: linux/arm64/v8
-    image: mariadb
+    image: hypriot/rpi-mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: backend
